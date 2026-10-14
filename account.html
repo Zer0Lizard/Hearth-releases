@@ -1,0 +1,128 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Your Hearth account</title>
+<meta name="description" content="Make your Hearth account, see invites to your friends' servers, and open the Hearths you've joined.">
+<meta name="theme-color" content="#1F1E1D">
+<link rel="icon" type="image/png" sizes="32x32" href="img/favicon-32.png">
+<link rel="apple-touch-icon" href="img/apple-touch-icon.png">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:wght@600;700;800&family=Figtree:wght@400;500;600&display=swap">
+<style>
+:root{--bg:#1A1918;--panel:#262624;--raise:#30302E;--ink:#FAF9F5;--mute:#A6A39A;--line:#3A3936;--gold:#E5A91C;--gold2:#F2C14E;--goldink:#2A2418;--ok:#6CC08B;--bad:#E8806F}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--ink);font:16px/1.6 Figtree,system-ui,sans-serif;-webkit-font-smoothing:antialiased}
+a{color:var(--gold2)}
+.wrap{max-width:720px;margin:0 auto;padding:0 16px 60px}
+h1,h2,h3{font-family:'Bricolage Grotesque',Figtree,sans-serif;letter-spacing:-.02em;line-height:1.15;margin:0}
+.nav{display:flex;align-items:center;gap:12px;padding:18px 0;max-width:1120px;margin:0 auto;padding-left:16px;padding-right:16px}
+.nav img{width:34px;height:34px}.nav b{font:800 21px 'Bricolage Grotesque',sans-serif;letter-spacing:-.02em}.nav a{color:inherit;text-decoration:none;display:flex;align-items:center;gap:12px}
+.nav .right{margin-left:auto;display:flex;gap:16px;align-items:center;font-weight:500;white-space:nowrap;font-size:15px}.nav .right a{color:var(--mute)}
+.card{background:var(--panel);border:1px solid var(--line);border-radius:18px;padding:24px;margin-top:18px}
+.card h1{font-size:30px;margin-bottom:6px}.card h2{font-size:21px;margin-bottom:10px}
+p.mute,.mute{color:var(--mute)}
+label{display:block;font-weight:600;font-size:14px;margin:14px 0 6px}
+input[type=email],input[type=password],input[type=text]{width:100%;background:var(--raise);border:1px solid var(--line);color:var(--ink);border-radius:12px;padding:12px 14px;font:inherit}
+input:focus{outline:2px solid var(--gold);outline-offset:1px}
+.ck{display:flex;gap:10px;align-items:flex-start;font-weight:500;margin-top:14px}.ck input{width:18px;height:18px;margin-top:3px;accent-color:var(--gold)}
+.btn{display:inline-flex;align-items:center;justify-content:center;gap:8px;border-radius:999px;padding:12px 22px;font:600 16px Figtree,sans-serif;text-decoration:none;border:1px solid var(--line);cursor:pointer;background:var(--raise);color:var(--ink)}
+.btn.go{background:var(--gold);color:var(--goldink);border-color:var(--gold)}.btn.go:hover{background:var(--gold2)}.btn:disabled{opacity:.55;cursor:default}
+.btn.sm{padding:7px 14px;font-size:14px}.btn.full{width:100%;margin-top:20px}
+.tabs{display:flex;gap:6px;background:var(--raise);border-radius:999px;padding:4px;margin:4px 0 6px}.tabs button{flex:1;border:0;background:none;color:var(--mute);font:600 15px Figtree,sans-serif;padding:9px;border-radius:999px;cursor:pointer}
+.tabs button.on{background:var(--panel);color:var(--ink)}
+.err{color:var(--bad);font-size:14px;margin-top:10px;min-height:1px}.ok{color:var(--ok)}
+.links{display:flex;gap:14px;justify-content:center;margin-top:14px;font-size:14px;flex-wrap:wrap}.links button{background:none;border:0;color:var(--mute);text-decoration:underline;cursor:pointer;font:inherit}
+.me{display:flex;align-items:center;gap:14px;flex-wrap:wrap}.me .name{font:700 26px 'Bricolage Grotesque',sans-serif}
+.item{display:flex;gap:14px;align-items:center;padding:14px 0;border-top:1px solid var(--line);flex-wrap:wrap}.item:first-of-type{border-top:0}
+.item .grow{flex:1;min-width:200px}.item b{display:block}.chip{display:inline-block;background:var(--raise);border-radius:999px;padding:1px 10px;font-size:13px;margin:4px 6px 0 0}
+.banner{border:1px solid var(--gold);color:var(--gold2);border-radius:14px;padding:12px 16px;margin-top:18px}.banner.warn{border-color:var(--bad);color:var(--bad)}
+.toast{position:fixed;left:50%;bottom:20px;transform:translateX(-50%);background:var(--raise);border:1px solid var(--line);border-radius:12px;padding:10px 16px;display:none;max-width:90vw}
+</style>
+</head>
+<body>
+<div class="nav"><a href="./"><img src="img/icon-192.png" alt=""><b>Hearth</b></a><div class="right"><a href="./">Download</a><span id="who"></span></div></div>
+<div class="wrap"><div id="banners"></div><div id="app"><div class="card"><p class="mute">Loading…</p></div></div></div>
+<div class="toast" id="toast"></div>
+<script>
+// Hearth accounts on the website. Logins and passwords: Firebase Authentication (its public web key below).
+// Usernames, invites and "Your Hearths": the Hearth accounts service at accounts.hearthapp.cc.
+const FB_KEY='AIzaSyD32zcWLYYPrgpkgzV286SZZe8zxH4Jj74', SVC='https://accounts.hearthapp.cc';
+const $=s=>document.querySelector(s),esc=s=>String(s==null?'':s).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+const store={get(k){try{return JSON.parse(localStorage.getItem('hearth-'+k))}catch{return null}},set(k,v){try{v==null?localStorage.removeItem('hearth-'+k):localStorage.setItem('hearth-'+k,JSON.stringify(v))}catch{}}};
+function toast(t,bad){const e=$('#toast');e.textContent=t;e.style.display='block';e.style.color=bad?'var(--bad)':'';clearTimeout(e._t);e._t=setTimeout(()=>e.style.display='none',4000)}
+const FB_ERR={EMAIL_EXISTS:'There is already an account with that email. Log in instead.',INVALID_EMAIL:"That email doesn't look right.",INVALID_LOGIN_CREDENTIALS:'Wrong email or password.',INVALID_PASSWORD:'Wrong email or password.',EMAIL_NOT_FOUND:'Wrong email or password.',USER_DISABLED:'This account is turned off.',TOO_MANY_ATTEMPTS_TRY_LATER:'Too many tries. Wait a few minutes and try again.',WEAK_PASSWORD:'Pick a longer password (at least 8 characters).',MISSING_PASSWORD:'Type your password.'};
+async function fb(path,body){const r=await fetch('https://identitytoolkit.googleapis.com/v1/accounts:'+path+'?key='+FB_KEY,{method:'POST',headers:{'content-type':'application/json'},body:JSON.stringify(body)});const j=await r.json().catch(()=>({}));
+if(!r.ok){const c=((j.error||{}).message||'').split(' : ')[0];throw new Error(FB_ERR[c]||FB_ERR[c.split(' ')[0]]||'Something went wrong ('+c+'). Try again.')}return j}
+// The login: Firebase's refresh token is kept in this browser; ID tokens last an hour
+let S=store.get('session');   // {idToken, refreshToken, expires, email}
+async function token(force){if(!S)return null;if(!force&&S.expires>Date.now()+60e3)return S.idToken;
+const r=await fetch('https://securetoken.googleapis.com/v1/token?key='+FB_KEY,{method:'POST',headers:{'content-type':'application/x-www-form-urlencoded'},body:'grant_type=refresh_token&refresh_token='+encodeURIComponent(S.refreshToken)});
+if(!r.ok){logout();return null}const j=await r.json();S={...S,idToken:j.id_token,refreshToken:j.refresh_token,expires:Date.now()+(+j.expires_in)*1000};store.set('session',S);return S.idToken}
+function keep(j){S={idToken:j.idToken,refreshToken:j.refreshToken,expires:Date.now()+(+j.expiresIn)*1000,email:j.email};store.set('session',S)}
+function logout(){S=null;store.set('session',null);store.set('pending-name',null);render()}
+async function svc(m,p,b,auth=true){const h={};if(b)h['content-type']='application/json';if(auth){const t=await token();if(!t)throw Object.assign(new Error('Log in again.'),{status:401});h.authorization='Bearer '+t}
+const r=await fetch(SVC+p,{method:m,headers:h,body:b?JSON.stringify(b):undefined});const j=await r.json().catch(()=>({}));if(!r.ok)throw Object.assign(new Error(j.error||'Error '+r.status),{status:r.status,data:j});return j}
+
+let MODE=new URLSearchParams(location.search).get('mode')==='signup'?'signup':'login';
+const field=(id,l,type='text',ac='off',ph='')=>`<label for="${id}">${l}</label><input id="${id}" type="${type}" autocomplete="${ac}" placeholder="${esc(ph)}" autocapitalize="off" spellcheck="false">`;
+function gate(){const sign=MODE==='signup',reset=MODE==='reset';
+$('#who').textContent='';
+$('#app').innerHTML=`<div class="card"><h1>${reset?'Reset your password':sign?'Make your Hearth account':'Log in to Hearth'}</h1><p class="mute">${reset?"Type your account's email and we'll send you a link to pick a new password.":sign?'One account for every Hearth: friends invite you by username, and you see every server you can use.':'See invites to your friends\' servers and the Hearths you\'ve joined.'}</p>
+${reset?'':`<div class="tabs"><button data-mode="login" class="${sign?'':'on'}">Log in</button><button data-mode="signup" class="${sign?'on':''}">Create account</button></div>`}
+${sign?field('un','Username','text','username','3-20 letters, numbers or _')+'<div class="mute" id="unok" style="font-size:14px;margin-top:4px"></div>':''}
+${field('em','Email','email','email')}${reset?'':field('pw',sign?'Password (8+ characters)':'Password','password',sign?'new-password':'current-password')}
+${sign?field('pw2','Confirm password','password','new-password')+'<label class="ck"><input type="checkbox" id="age"> I am 13 or older</label>':''}
+${sign?'<p class="mute" style="font-size:14px;margin:12px 0 0">By creating an account you agree to how Hearth handles your info: <a href="privacy">Privacy</a>.</p>':''}<div class="err" id="err"></div><button class="btn go full" id="go">${reset?'Send the link':sign?'Create my account':'Log in'}</button>
+<div class="links">${reset?'<button data-mode="login">Back to log in</button>':'<button data-mode="reset">Forgot your password?</button>'}</div></div>`;
+const f=$('#un')||$('#em');if(f)f.focus()}
+let unT;document.addEventListener('input',e=>{if(e.target.id!=='un')return;clearTimeout(unT);const n=e.target.value.trim(),o=$('#unok');if(!n){o.textContent='';return}
+unT=setTimeout(async()=>{try{const r=await svc('GET','/v1/username?name='+encodeURIComponent(n),null,false);o.innerHTML=r.available?'<span class="ok">✓ Available</span>':'<span class="err">'+esc(r.error||'Taken')+'</span>'}catch{o.textContent=''}},350)});
+async function submit(){const v=id=>($('#'+id)||{}).value||'',err=t=>{$('#err').textContent=t},b=$('#go');err('');b.disabled=true;try{
+if(MODE==='reset'){await fb('sendOobCode',{requestType:'PASSWORD_RESET',email:v('em').trim()});$('#app').innerHTML='<div class="card"><h1>Check your email</h1><p class="mute">If there\'s a Hearth account for that email, a link to pick a new password is on its way. Check spam too.</p><button class="btn" data-mode="login">Back to log in</button></div>';return}
+if(MODE==='signup'){const n=v('un').trim();if(!/^[A-Za-z0-9_]{3,20}$/.test(n))return err('Usernames are 3-20 letters, numbers or _.');if(v('pw').length<8)return err('Pick a password with at least 8 characters.');if(v('pw')!==v('pw2'))return err('The passwords don\'t match.');if(!$('#age').checked)return err('You must be 13 or older to make a Hearth account.');
+const av=await svc('GET','/v1/username?name='+encodeURIComponent(n),null,false);if(!av.available)return err(av.error||'That username is taken.');
+const j=await fb('signUp',{email:v('em').trim(),password:v('pw'),returnSecureToken:true});keep(j);store.set('pending-name',n);await fb('sendOobCode',{requestType:'VERIFY_EMAIL',idToken:j.idToken});return render()}
+const j=await fb('signInWithPassword',{email:v('em').trim(),password:v('pw'),returnSecureToken:true});keep(j);render()
+}catch(e){err(e.message)}finally{if(b)b.disabled=false}}
+
+async function render(){if(!S)return gate();let me;
+try{me=await svc('GET','/v1/me')}catch(e){
+if(e.status===401)return logout();
+if(e.data&&e.data.needsUsername)return pickName();
+if(e.data&&e.data.maintenance){$('#app').innerHTML='<div class="card"><h1>Back soon</h1><p class="mute">'+esc(e.message)+'</p></div>';return}
+$('#app').innerHTML='<div class="card"><h1>Hmm</h1><p class="err">'+esc(e.message)+'</p><button class="btn" id="lo">Log out</button></div>';return}
+$('#who').innerHTML=esc(me.username)+' · <a href="#" id="lo2">Log out</a>';
+const [box,mine]=await Promise.all([svc('GET','/v1/inbox').catch(()=>({invites:[]})),svc('GET','/v1/my-hearths').catch(()=>({hosting:[],joined:[]}))]);
+const roleL={guest:'Guest',helper:'Helper',owner:'Owner'},open=u=>u?`<a class="btn sm go" href="${esc(u)}" target="_blank" rel="noopener">Open</a>`:'';
+$('#app').innerHTML=`<div class="card"><div class="me"><div><div class="mute" style="font-size:14px">Your username</div><div class="name">${esc(me.username)}</div></div><button class="btn sm" data-copy="${esc(me.username)}">Copy</button></div>
+<p class="mute" style="margin:10px 0 0">Send this to a friend who runs a Hearth. They invite you by username, and the invite shows up here and in your Hearth app.</p></div>
+<div class="card"><h2>Invites${box.invites.length?' <span class="chip" style="background:var(--gold);color:var(--goldink)">'+box.invites.length+'</span>':''}</h2>${box.invites.length?box.invites.map(i=>`<div class="item"><div class="grow"><b>${esc(i.from)} invited you to ${esc(i.hearth.name)}</b>${i.servers.map(s=>`<span class="chip">${esc(s.name)} · ${roleL[s.role]||esc(s.role)}</span>`).join('')}</div><button class="btn sm go" data-acc="${esc(i.id)}">Accept</button><button class="btn sm" data-dec="${esc(i.id)}">Decline</button></div>`).join(''):'<p class="mute">No invites right now.</p>'}</div>
+<div class="card"><h2>Your Hearths</h2>${mine.joined.length||mine.hosting.length?[...mine.hosting.map(h=>`<div class="item"><div class="grow"><b>${esc(h.name)}</b><span class="mute">You host this one${h.url?' · '+esc(h.url):''}</span></div>${open(h.url)}</div>`),...mine.joined.map(h=>`<div class="item"><div class="grow"><b>${esc(h.name)}</b><span class="mute">Hosted by ${esc(h.host||'?')}</span><div>${h.servers.map(s=>`<span class="chip">${esc(s.name)} · ${roleL[s.role]||esc(s.role)}</span>`).join('')}</div></div>${open(h.url)}</div>`)].join(''):'<p class="mute">None yet. Accept an invite, or <a href="./">download Hearth</a> to host your own servers.</p>'}</div>
+<div class="card"><h2>Account</h2><p class="mute" style="margin:0 0 12px">${esc(me.email)}</p><button class="btn sm" id="chpw">Change password</button> <button class="btn sm" id="lo">Log out</button> <button class="btn sm" id="del" style="color:var(--bad)">Delete my account</button><p class="mute" style="font-size:14px;margin:12px 0 0"><a href="privacy">What Hearth keeps about you</a></p></div>`;
+banners(me.announcements)}
+function pickName(){const pending=store.get('pending-name')||'';
+$('#app').innerHTML=`<div class="card"><h1>Confirm your email</h1><p class="mute">We sent a link to <b>${esc(S.email||'your email')}</b>. Open it, then come back and click <b>I've confirmed it</b>. Check spam if you don't see it.</p>
+${field('un','Your username','text','username','3-20 letters, numbers or _')}<div class="mute" id="unok" style="font-size:14px;margin-top:4px"></div><label class="ck"><input type="checkbox" id="age" ${pending?'checked':''}> I am 13 or older</label>
+<div class="err" id="err"></div><button class="btn go full" id="claim">I've confirmed it</button><div class="links"><button id="resend">Send the email again</button><button id="lo">Log out</button></div></div>`;
+$('#un').value=pending}
+async function claim(){const err=t=>{$('#err').textContent=t},n=$('#un').value.trim();err('');try{await token(true);
+await svc('POST','/v1/me',{username:n,age13:$('#age').checked});store.set('pending-name',null);toast('Welcome to Hearth, '+n+'!');render()}catch(e){err(e.message)}}
+function banners(list){$('#banners').innerHTML=(list||[]).map(a=>`<div class="banner ${a.level==='warn'?'warn':''}">${esc(a.text)}</div>`).join('')}
+document.addEventListener('click',async e=>{const t=e.target.closest('button,a');if(!t)return;const d=t.dataset;
+if(d.mode){MODE=d.mode;return gate()}
+if(t.id==='go')return submit();
+if(t.id==='claim')return claim();
+if(t.id==='lo'||t.id==='lo2'){e.preventDefault();return logout()}
+if(t.id==='resend'){try{await fb('sendOobCode',{requestType:'VERIFY_EMAIL',idToken:await token()});toast('Sent. Check your email.')}catch(x){toast(x.message,true)}return}
+if(t.id==='del'){if(prompt('This deletes your Hearth account for good: your username, invites and linked Hearths. Type DELETE to go on.')!=='DELETE')return;try{await svc('DELETE','/v1/me');await fb('delete',{idToken:await token()});toast('Your account is deleted.');logout()}catch(x){toast(x.message+' (if it says log in again, log out and back in, then try again)',true)}return}
+if(t.id==='chpw'){try{await fb('sendOobCode',{requestType:'PASSWORD_RESET',email:S.email});toast('We emailed you a link to pick a new password.')}catch(x){toast(x.message,true)}return}
+if(d.copy){navigator.clipboard.writeText(d.copy).then(()=>toast('Copied'),()=>{});return}
+if(d.acc||d.dec){t.disabled=true;try{const r=await svc('POST','/v1/invites/'+(d.acc||d.dec)+'/'+(d.acc?'accept':'decline'));toast(d.acc?'Accepted! '+(r.hearth&&r.hearth.url?'Open it from Your Hearths.':''):'Declined');render()}catch(x){toast(x.message,true);t.disabled=false}}});
+document.addEventListener('keydown',e=>{if(e.key!=='Enter'||e.target.tagName!=='INPUT')return;if($('#go'))submit();else if($('#claim'))claim()});
+svc('GET','/v1/status',null,false).then(s=>{if(!S)banners(s.announcements);if(s.maintenance&&!S)$('#banners').innerHTML+='<div class="banner warn">'+esc(s.message||'Hearth accounts are down for maintenance.')+'</div>'}).catch(()=>{});
+render();
+</script>
+</body>
+</html>

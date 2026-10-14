@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Hearth privacy</title>
+<meta name="description" content="What a Hearth account keeps about you, and why.">
+<meta name="theme-color" content="#1F1E1D">
+<link rel="icon" type="image/png" sizes="32x32" href="img/favicon-32.png">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:wght@700;800&family=Figtree:wght@400;600&display=swap">
+<style>
+:root{--bg:#1A1918;--panel:#262624;--ink:#FAF9F5;--mute:#A6A39A;--line:#3A3936;--gold2:#F2C14E}
+*{box-sizing:border-box}body{margin:0;background:var(--bg);color:var(--ink);font:16px/1.65 Figtree,system-ui,sans-serif}
+a{color:var(--gold2)}.wrap{max-width:720px;margin:0 auto;padding:0 16px 60px}
+.nav{display:flex;align-items:center;gap:12px;padding:18px 16px;max-width:1120px;margin:0 auto}.nav a{color:inherit;text-decoration:none;display:flex;align-items:center;gap:12px}
+.nav img{width:34px;height:34px}.nav b{font:800 21px 'Bricolage Grotesque',sans-serif}
+h1,h2{font-family:'Bricolage Grotesque',sans-serif;letter-spacing:-.02em;line-height:1.15}h1{font-size:34px;margin:16px 0 6px}h2{font-size:21px;margin:30px 0 6px}
+.mute{color:var(--mute)}li{margin:4px 0}
+</style>
+</head>
+<body>
+<div class="nav"><a href="./"><img src="img/icon-192.png" alt=""><b>Hearth</b></a></div>
+<div class="wrap">
+<h1>What Hearth keeps about you</h1>
+<p class="mute">Hearth Studios · last updated October 14, 2026</p>
+
+<h2>The short version</h2>
+<p>A Hearth account keeps only what it needs to let friends find you and invite you to their game servers. Nothing is sold, and there are no ads or trackers.</p>
+
+<h2>Your Hearth account</h2>
+<ul>
+<li><b>Email and password:</b> handled by Google's Firebase Authentication, which stores your password scrambled (hashed) so nobody, including us, can read it. Your email is used to confirm your account and to send password reset links.</li>
+<li><b>Username:</b> shown to people who invite you or share a Hearth with you.</li>
+<li><b>Invites and Hearths:</b> who invited you to which servers and with what role, and the addresses of Hearths that are linked to an account, so you can open them.</li>
+<li><b>When you were last active</b>, and any reports people send about an account, so we can deal with abuse.</li>
+</ul>
+
+<h2>The Hearth app on your PC</h2>
+<p>Your servers, files, settings, and the people who play on your servers stay on your own PC. Hearth doesn't send them anywhere. The only things that leave your PC are what you turn on yourself: remote access through Cloudflare, Discord notifications, and invites by username through your Hearth account.</p>
+
+<h2>Who else handles it</h2>
+<ul>
+<li><b>Google Firebase</b> for logins and passwords.</li>
+<li><b>Cloudflare</b> runs the accounts service and its database, and remote access if you turn it on.</li>
+<li><b>GitHub</b> hosts this website and the Hearth downloads.</li>
+</ul>
+
+<h2>Age</h2>
+<p>You must be 13 or older to make a Hearth account.</p>
+
+<h2>Deleting your account</h2>
+<p>Log in on the <a href="account">Account page</a> and choose <b>Delete my account</b>. Your username, invites and linked Hearths are removed right away, and your login is deleted from Firebase. Hearths you joined may still list your username until their host removes you.</p>
+</div>
+</body>
+</html>
