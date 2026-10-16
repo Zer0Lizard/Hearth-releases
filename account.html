@@ -150,8 +150,8 @@ const hosts=mine.hosting.length>0,joined=mine.joined.length>0,inv=box.invites.le
 const steps=[
  {done:true,t:'Make your Hearth account',d:'Done. Welcome!'},
  {done:joined,t:'Get invited to a friend\'s server',d:'Send your username to a friend who runs a Hearth. They add you on a server\'s People tab, and you accept the invite here or in your Hearth app.',a:`<button class="btn sm" data-copy="${esc(me.username)}">Copy username</button>`},
- {done:false,app:true,t:'Connect this account in the Hearth app',d:'In Hearth: Settings › Hearth account. Then your friends\' servers show on your home page, and invites pop up at the bell.',a:'<a class="btn sm go" href="./">Get Hearth</a>'},
- {done:hosts,t:'Hosting servers? Link your Hearth',d:'In Hearth: Settings › Hearth account › Link this Hearth. With two-factor login on, it gets a free address you can open from anywhere.'}];
+ {done:false,app:true,t:'Use it in the Hearth app',d:'Log in with this account when Hearth first opens (already using Hearth? Settings › Hearth account). Your friends\' servers then show on your home page, and invites pop up at the bell.',a:'<a class="btn sm go" href="./">Get Hearth</a>'},
+ {done:hosts,t:'Hosting servers? Link your Hearth',d:'Setting Hearth up with this account links it for you (or Settings › Hearth account › Link this Hearth). With two-factor login on, it gets a free address you can open from anywhere.'}];
 const left=steps.filter(x=>!x.done&&!(x.app&&(hosts||joined))).length;
 const startCard=left>1?`<div class="card" style="--i:1"><div class="split"><h2 style="margin:0">Getting started</h2><span class="mute" style="font-size:14px">${4-left} of 4 done</span></div><p class="mute" style="margin:6px 0 14px">A few things to make the most of your account.</p><ol class="todo">${steps.map((x,i)=>{const d=x.done||(x.app&&(hosts||joined));return `<li data-n="${i+1}" class="${d?'done':''}"><div><b>${x.t}</b>${d?'':`<span>${x.d}</span>`}</div>${d?'':x.a||''}</li>`}).join('')}</ol></div>`:'';
 const empty=(k,t)=>`<div class="empty"><div class="hic">${svg(k)}</div><div>${t}</div></div>`;
