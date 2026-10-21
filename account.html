@@ -55,6 +55,9 @@ transition:transform .2s var(--ease),box-shadow .2s var(--ease),background-color
 .links{display:flex;gap:14px;justify-content:center;margin-top:14px;font-size:14px;flex-wrap:wrap}.links button{background:none;border:0;color:var(--mute);text-decoration:underline;cursor:pointer;font:inherit;transition:color .2s}.links button:hover{color:var(--ink)}
 .me{display:flex;align-items:center;gap:16px;flex-wrap:wrap}.me .name{font:700 28px 'Bricolage Grotesque',sans-serif;line-height:1.1}
 .me .av{width:56px;height:56px;font-size:26px;transition:transform .35s var(--spring)}.me:hover .av{transform:scale(1.06) rotate(-5deg)}
+.av{position:relative;overflow:hidden;flex:none}.av img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover}.av.sm{width:38px;height:38px;border-radius:12px;font-size:16px}
+.picbtns{display:flex;gap:6px;flex-wrap:wrap;margin-top:8px}.fadd{display:flex;gap:8px;flex-wrap:wrap;margin-top:8px}.fadd input{flex:1;min-width:200px;margin:0}.tag{color:var(--mute);font-size:14px}
+.sec{font-size:13px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;color:var(--mute);margin:18px 0 2px}
 .item{display:flex;gap:12px;align-items:center;padding:14px 12px;margin:0 -12px;border-radius:12px;flex-wrap:wrap;transition:background-color .2s}
 .item+.item{border-top:1px solid var(--line)}.item:hover{background:rgba(var(--goldrgb),.05)}
 .item .grow{flex:1;min-width:200px}.item b{display:block}.chip{display:inline-block;background:var(--raise);border-radius:999px;padding:1px 10px;font-size:13px;margin:4px 6px 0 0}
@@ -143,8 +146,12 @@ if(e.status===401)return logout();
 if(e.data&&e.data.needsUsername)return pickName();
 if(e.data&&e.data.maintenance){$('#app').innerHTML='<div class="card"><h1>Back soon</h1><p class="mute">'+esc(e.message)+'</p></div>';return}
 $('#app').innerHTML='<div class="card"><h1>Hmm</h1><p class="err">'+esc(e.message)+'</p><button class="btn" id="lo">Log out</button></div>';return}
-$('#who').innerHTML='<span class="who"><span class="av">'+esc(me.username[0])+'</span>'+esc(me.username)+'</span><a href="#" id="lo2">Log out</a>';
-const [box,mine]=await Promise.all([svc('GET','/v1/inbox').catch(()=>({invites:[]})),svc('GET','/v1/my-hearths').catch(()=>({hosting:[],joined:[]}))]);
+$('#who').innerHTML='<span class="who">'+(me.pic?`<span class="av">${esc(me.username[0])}<img src="${SVC}/v1/pictures/${encodeURIComponent(me.uid)}?v=${+me.pic}" alt="" onerror="this.remove()"></span>`:'<span class="av">'+esc(me.username[0])+'</span>')+esc(me.username)+'</span><a href="#" id="lo2">Log out</a>';
+const [box,mine,fr]=await Promise.all([svc('GET','/v1/inbox').catch(()=>({invites:[]})),svc('GET','/v1/my-hearths').catch(()=>({hosting:[],joined:[]})),svc('GET','/v1/friends').catch(()=>({friends:[],incoming:[],outgoing:[]}))]);
+// A Hearth account's picture (or their first letter)
+const avi=(x,cls='')=>`<span class="av${cls?' '+cls:''}">${esc((x.username||'?')[0])}${x.pic?`<img src="${SVC}/v1/pictures/${encodeURIComponent(x.uid)}?v=${+x.pic}" alt="" onerror="this.remove()">`:''}</span>`;
+const who=x=>`${avi(x,'sm')}<div class="grow"><b>${esc(x.username)}</b><div class="tag">#${esc(x.tag||'????')}</div></div>`;
+const nreq=fr.incoming.length;
 const roleL={guest:'Guest',helper:'Helper',owner:'Owner'},open=u=>u?`<a class="btn sm" href="${esc(u)}" target="_blank" rel="noopener">Open in browser</a>`:'';
 const hosts=mine.hosting.length>0,joined=mine.joined.length>0,inv=box.invites.length;
 const steps=[
@@ -155,12 +162,19 @@ const steps=[
 const left=steps.filter(x=>!x.done&&!(x.app&&(hosts||joined))).length;
 const startCard=left>1?`<div class="card" style="--i:1"><div class="split"><h2 style="margin:0">Getting started</h2><span class="mute" style="font-size:14px">${4-left} of 4 done</span></div><p class="mute" style="margin:6px 0 14px">A few things to make the most of your account.</p><ol class="todo">${steps.map((x,i)=>{const d=x.done||(x.app&&(hosts||joined));return `<li data-n="${i+1}" class="${d?'done':''}"><div><b>${x.t}</b>${d?'':`<span>${x.d}</span>`}</div>${d?'':x.a||''}</li>`}).join('')}</ol></div>`:'';
 const empty=(k,t)=>`<div class="empty"><div class="hic">${svg(k)}</div><div>${t}</div></div>`;
-$('#app').innerHTML=`<div class="card" style="--i:0"><div class="me"><span class="av">${esc(me.username[0])}</span><div style="flex:1;min-width:160px"><div class="mute" style="font-size:14px">Your username</div><div class="name">${esc(me.username)}</div>${me.tag?`<div class="mute" style="font-size:14px">Friend tag <b>${esc(me.username)}#${esc(me.tag)}</b>: friends add you with this in the Friends tab of their Hearth app</div>`:''}</div><button class="btn sm" data-copy="${esc(me.tag?me.username+'#'+me.tag:me.username)}">Copy</button></div>
-<p class="mute" style="margin:14px 0 0">This is the name friends type to invite you. Invites show up here and in your Hearth app.</p></div>
+$('#app').innerHTML=`<div class="card" style="--i:0"><div class="me">${avi(me)}<div style="flex:1;min-width:160px"><div class="mute" style="font-size:14px">Your username</div><div class="name">${esc(me.username)}</div>${me.tag?`<div class="mute" style="font-size:14px">Friend tag <b>${esc(me.username)}#${esc(me.tag)}</b>: friends add you with this in the Friends tab of their Hearth app</div>`:''}</div><button class="btn sm" data-copy="${esc(me.tag?me.username+'#'+me.tag:me.username)}">Copy</button></div>
+<div class="picbtns"><button class="btn sm" id="pic">${me.pic?'Change picture':'Add a picture'}</button>${me.pic?'<button class="btn sm" id="picrm">Remove picture</button>':''}<input type="file" id="picin" accept="image/png,image/jpeg,image/webp" hidden></div>
+<p class="mute" style="margin:14px 0 0">Your picture shows on every Hearth you use and to your friends. Friends invite you by your username and add you with your friend tag.</p></div>
 ${startCard}
 <div class="card" style="--i:2"><h2>Invites${inv?' <span class="count">'+inv+'</span>':''}</h2>${inv?box.invites.map(i=>`<div class="item"><div class="hic">${esc((i.hearth.name||'?')[0])}</div><div class="grow"><b>${esc(i.from)} invited you to ${esc(i.hearth.name)}</b>${i.servers.map(s=>`<span class="chip">${esc(s.name)} · ${roleL[s.role]||esc(s.role)}</span>`).join('')}</div><div class="row"><button class="btn sm go" data-acc="${esc(i.id)}">Accept</button><button class="btn sm" data-dec="${esc(i.id)}">Decline</button></div></div>`).join(''):empty('mail','No invites right now. When a friend adds you, it shows up here.')}</div>
-<div class="card" style="--i:3"><h2>Your Hearths</h2>${joined||hosts?[...mine.hosting.map(h=>`<div class="item"><div class="hic">${svg('home')}</div><div class="grow"><b>${esc(h.name)}</b><span class="mute">You host this one${h.url?' · '+esc(h.url):''}</span></div>${open(h.url)}</div>`),...mine.joined.map(h=>`<div class="item"><div class="hic">${esc((h.name||'?')[0])}</div><div class="grow"><b>${esc(h.name)}</b><span class="mute">Hosted by ${esc(h.host||'?')}</span><div>${h.servers.map(s=>`<span class="chip">${esc(s.name)} · ${roleL[s.role]||esc(s.role)}</span>`).join('')}</div></div>${open(h.url)}</div>`)].join('')+'<p class="mute" style="font-size:14px;margin:12px 0 0">Tip: in the Hearth app, these open from your rail, already logged in.</p>':empty('servers','None yet. Accept an invite to join a friend\'s Hearth, or <a href="./">download Hearth</a> to host your own servers.')}</div>
-<div class="card" style="--i:4"><h2>Account</h2><div class="split"><div><div class="mute" style="font-size:14px">Email</div><div>${esc(me.email)}</div></div><div class="row"><button class="btn sm" id="chpw">Change password</button><button class="btn sm" id="lo">Log out</button></div></div>
+<div class="card" style="--i:3"><h2>Friends${nreq?' <span class="count">'+nreq+'</span>':''}</h2>
+<div class="mute" style="font-size:14px">Add a friend with their username and # number, like Carsyn#4821.</div>
+<div class="fadd"><input id="fto" type="text" placeholder="Username#1234" maxlength="50" autocomplete="off" autocapitalize="off" spellcheck="false" aria-label="Friend's username and number"><button class="btn sm go" id="fadd">Send request</button></div><div class="err" id="ferr"></div>
+${nreq?`<div class="sec">Friend requests</div>`+fr.incoming.map(x=>`<div class="item">${who(x)}<div class="row"><button class="btn sm go" data-fact="accept" data-fuid="${esc(x.uid)}">Accept</button><button class="btn sm" data-fact="decline" data-fuid="${esc(x.uid)}">Decline</button></div></div>`).join(''):''}
+<div class="sec">Your friends · ${fr.friends.length}</div>${fr.friends.length?fr.friends.map(x=>`<div class="item">${who(x)}<button class="btn sm" data-fact="remove" data-fuid="${esc(x.uid)}" data-fname="${esc(x.username)}">Remove</button></div>`).join(''):empty('user','No friends yet. Send a friend your tag, or add theirs above. Then, in the Hearth app, invite them to your servers from Friends.')}
+${fr.outgoing.length?`<div class="sec">Sent requests</div>`+fr.outgoing.map(x=>`<div class="item">${who(x)}<span class="mute" style="font-size:14px">Waiting for them</span><button class="btn sm" data-fact="remove" data-fuid="${esc(x.uid)}" data-fcancel="1">Cancel</button></div>`).join(''):''}</div>
+<div class="card" style="--i:4"><h2>Your Hearths</h2>${joined||hosts?[...mine.hosting.map(h=>`<div class="item"><div class="hic">${svg('home')}</div><div class="grow"><b>${esc(h.name)}</b><span class="mute">You host this one${h.url?' · '+esc(h.url):''}</span></div>${open(h.url)}</div>`),...mine.joined.map(h=>`<div class="item"><div class="hic">${esc((h.name||'?')[0])}</div><div class="grow"><b>${esc(h.name)}</b><span class="mute">Hosted by ${esc(h.host||'?')}</span><div>${h.servers.map(s=>`<span class="chip">${esc(s.name)} · ${roleL[s.role]||esc(s.role)}</span>`).join('')}</div></div>${open(h.url)}</div>`)].join('')+'<p class="mute" style="font-size:14px;margin:12px 0 0">Tip: in the Hearth app, these open from your rail, already logged in.</p>':empty('servers','None yet. Accept an invite to join a friend\'s Hearth, or <a href="./">download Hearth</a> to host your own servers.')}</div>
+<div class="card" style="--i:5"><h2>Account</h2><div class="split"><div><div class="mute" style="font-size:14px">Email</div><div>${esc(me.email)}</div></div><div class="row"><button class="btn sm" id="chpw">Change password</button><button class="btn sm" id="lo">Log out</button></div></div>
 <hr><div class="split"><div><b>Delete account</b><div class="mute" style="font-size:14px">Removes your username, invites and linked Hearths for good.</div></div><button class="btn sm danger" id="del">Delete my account</button></div>
 <p class="mute" style="font-size:14px;margin:16px 0 0"><a href="privacy">What Hearth keeps about you</a></p></div>`;
 banners(me.announcements)}
@@ -180,9 +194,24 @@ if(t.id==='lo'||t.id==='lo2'){e.preventDefault();return logout()}
 if(t.id==='resend'){try{await fb('sendOobCode',{requestType:'VERIFY_EMAIL',idToken:await token()});toast('Sent. Check your email.')}catch(x){toast(x.message,true)}return}
 if(t.id==='del'){if(prompt('This deletes your Hearth account for good: your username, invites and linked Hearths. Type DELETE to go on.')!=='DELETE')return;try{await svc('DELETE','/v1/me');await fb('delete',{idToken:await token()});toast('Your account is deleted.');logout()}catch(x){toast(x.message+' (if it says log in again, log out and back in, then try again)',true)}return}
 if(t.id==='chpw'){try{await fb('sendOobCode',{requestType:'PASSWORD_RESET',email:S.email});toast('We emailed you a link to pick a new password.')}catch(x){toast(x.message,true)}return}
+if(t.id==='fadd')return addFriend();
+if(d.fact){if(d.fact==='remove'&&!d.fcancel&&!confirm('Remove '+d.fname+' from your friends? Their access to servers doesn\'t change.'))return;t.disabled=true;
+try{await svc('POST','/v1/friends/'+encodeURIComponent(d.fuid)+'/'+d.fact);toast({accept:'You\'re friends now',decline:'Declined',remove:d.fcancel?'Request cancelled':'Removed'}[d.fact]);render()}catch(x){toast(x.message,true);t.disabled=false}return}
+if(t.id==='pic'){$('#picin').click();return}
+if(t.id==='picrm'){t.disabled=true;try{await svc('DELETE','/v1/me/picture');toast('Picture removed');render()}catch(x){toast(x.message,true);t.disabled=false}return}
 if(d.copy){navigator.clipboard.writeText(d.copy).then(()=>toast('Copied'),()=>{});return}
 if(d.acc||d.dec){t.disabled=true;try{const r=await svc('POST','/v1/invites/'+(d.acc||d.dec)+'/'+(d.acc?'accept':'decline'));toast(d.acc?'Accepted! '+(r.hearth&&r.hearth.url?'Open it from Your Hearths.':''):'Declined');render()}catch(x){toast(x.message,true);t.disabled=false}}});
-document.addEventListener('keydown',e=>{if(e.key!=='Enter'||e.target.tagName!=='INPUT')return;if($('#go'))submit();else if($('#claim'))claim()});
+document.addEventListener('keydown',e=>{if(e.key!=='Enter'||e.target.tagName!=='INPUT')return;if(e.target.id==='fto')return addFriend();if($('#go'))submit();else if($('#claim'))claim()});
+async function addFriend(){const i=$('#fto'),v=(i&&i.value||'').trim(),er=$('#ferr');if(er)er.textContent='';if(!v)return i&&i.focus();
+try{const r=await svc('POST','/v1/friends',{to:v});toast(r.status==='accepted'?'You and '+r.friend.username+' are friends now':r.already?'Already sent to '+r.friend.username:'Friend request sent to '+r.friend.username);render()}catch(x){if(er)er.textContent=x.message}}
+// Profile picture: cropped to the middle square and shrunk to 256 px before it's sent (WebP, or PNG where WebP can't be made)
+document.addEventListener('change',async e=>{if(e.target.id!=='picin')return;const f=e.target.files&&e.target.files[0];e.target.value='';if(!f)return;
+if(!/^image\/(png|jpeg|webp)$/.test(f.type))return toast('Pick a PNG, JPG or WebP picture.',true);
+try{const img=await new Promise((ok,no)=>{const u=URL.createObjectURL(f),im=new Image();im.onload=()=>{URL.revokeObjectURL(u);ok(im)};im.onerror=()=>no(new Error('That picture could not be opened.'));im.src=u});
+const n=Math.min(img.naturalWidth,img.naturalHeight),c=document.createElement('canvas');c.width=c.height=256;
+c.getContext('2d').drawImage(img,(img.naturalWidth-n)/2,(img.naturalHeight-n)/2,n,n,0,0,256,256);
+let data=c.toDataURL('image/webp',.86);if(!/^data:image\/webp/.test(data))data=c.toDataURL('image/png');
+await svc('PUT','/v1/me/picture',{image:data});toast('Picture saved. It shows on your Hearths within a few minutes.');render()}catch(x){toast(x.message,true)}});
 svc('GET','/v1/status',null,false).then(s=>{if(!S)banners(s.announcements);if(s.maintenance&&!S)$('#banners').innerHTML+='<div class="banner warn">'+esc(s.message||'Hearth accounts are down for maintenance.')+'</div>'}).catch(()=>{});
 render();
 </script>
