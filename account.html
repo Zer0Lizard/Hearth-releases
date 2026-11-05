@@ -148,11 +148,11 @@ ${sign?'<p class="mute" style="font-size:14px;margin:12px 0 0">By creating an ac
 <div class="links">${reset?'<button data-mode="login">Back to log in</button>':'<button data-mode="reset">Forgot your password?</button>'}</div></div>${reset?'':why()}`;
 const f=$('#un')||$('#em');if(f)f.focus()}
 let unT;document.addEventListener('input',e=>{if(e.target.id!=='un')return;clearTimeout(unT);const n=e.target.value.trim(),o=$('#unok');if(!n){o.textContent='';return}
-unT=setTimeout(async()=>{try{const r=await svc('GET','/v1/username?name='+encodeURIComponent(n),null,false);o.innerHTML=r.available?'<span class="ok">✓ Available</span>':'<span class="err">'+esc(r.error||'Taken')+'</span>'}catch{o.textContent=''}},350)});
+unT=setTimeout(async()=>{try{const r=await svc('GET','/v1/username?name='+encodeURIComponent(n)+'&email='+encodeURIComponent((($('#em')||{}).value||'').trim()),null,false);o.innerHTML=r.available?'<span class="ok">✓ Available</span>':'<span class="err">'+esc(r.error||'Taken')+'</span>'}catch{o.textContent=''}},350)});
 async function submit(){const v=id=>($('#'+id)||{}).value||'',err=t=>{$('#err').textContent=t},b=$('#go');err('');b.disabled=true;b.classList.add('busy');try{
 if(MODE==='reset'){await fb('sendOobCode',{requestType:'PASSWORD_RESET',email:v('em').trim()});$('#app').innerHTML='<div class="card"><div class="hic" style="margin-bottom:14px">'+svg('mail')+'</div><h1>Check your email</h1><p class="mute">If there\'s a Hearth account for that email, a link to pick a new password is on its way. Check spam too.</p><button class="btn" data-mode="login">Back to log in</button></div>';return}
 if(MODE==='signup'){const n=v('un').trim();if(!/^[A-Za-z0-9_]{3,20}$/.test(n))return err('Usernames are 3-20 letters, numbers or _.');if(v('pw').length<8)return err('Pick a password with at least 8 characters.');if(v('pw')!==v('pw2'))return err('The passwords don\'t match.');if(!$('#age').checked)return err('You must be 13 or older to make a Hearth account.');
-const av=await svc('GET','/v1/username?name='+encodeURIComponent(n),null,false);if(!av.available)return err(av.error||'That username is taken.');
+const av=await svc('GET','/v1/username?name='+encodeURIComponent(n)+'&email='+encodeURIComponent(v('em').trim()),null,false);if(!av.available)return err(av.error||'That username is taken.');
 const j=await fb('signUp',{email:v('em').trim(),password:v('pw'),returnSecureToken:true});keep(j);store.set('pending-name',n);await fb('sendOobCode',{requestType:'VERIFY_EMAIL',idToken:j.idToken});return render()}
 const j=await fb('signInWithPassword',{email:v('em').trim(),password:v('pw'),returnSecureToken:true});keep(j);render()
 }catch(e){err(e.message)}finally{if(b){b.disabled=false;b.classList.remove('busy')}}}
