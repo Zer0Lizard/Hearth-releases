@@ -95,6 +95,7 @@ dialog.askdlg{border:1px solid var(--line);border-radius:16px;background:var(--p
 .askb{display:flex;gap:8px;flex-wrap:wrap;justify-content:flex-end;margin-top:20px}
 .askbtn{border-radius:999px;padding:9px 18px;border:1px solid var(--line);background:var(--raise,var(--bg));color:var(--ink);font:inherit;font-weight:600;cursor:pointer}
 .askbtn.askgo{background:var(--gold,var(--acc));border-color:var(--gold,var(--acc));color:var(--goldink,#1d1a17)}.askbtn.askdanger{background:color-mix(in srgb,var(--bad) 78%,#000);border-color:transparent;color:#fff}
+.badges{display:flex;flex-wrap:wrap;gap:6px;margin-top:6px}.badge{display:inline-block;padding:2px 10px;border-radius:99px;font-size:12px;font-weight:600}.badge.dev{color:var(--goldink);background:linear-gradient(135deg,var(--gold),var(--gold2))}.badge.beta{border:1px solid rgba(var(--goldrgb),.6);background:var(--raise)}
 </style>
 </head>
 <body>
@@ -167,7 +168,9 @@ $('#who').innerHTML='<span class="who">'+(me.pic?`<span class="av">${esc(me.user
 const [box,mine,fr]=await Promise.all([svc('GET','/v1/inbox').catch(()=>({invites:[]})),svc('GET','/v1/my-hearths').catch(()=>({hosting:[],joined:[]})),svc('GET','/v1/friends').catch(()=>({friends:[],incoming:[],outgoing:[]}))]);
 // A Hearth account's picture (or their first letter)
 const avi=(x,cls='')=>`<span class="av${cls?' '+cls:''}">${esc((x.username||'?')[0])}${x.pic?`<img src="${SVC}/v1/pictures/${encodeURIComponent(x.uid)}?v=${+x.pic}" alt="" onerror="this.remove()">`:''}</span>`;
-const who=x=>`${avi(x,'sm')}<div class="grow"><b>${esc(x.username)}</b><div class="tag">#${esc(x.tag||'????')}</div></div>`;
+const BADGES={dev:['Hearth Studios','The people who make Hearth','dev'],beta:['Beta tester','Here before Hearth 1.0. Thanks for helping make it!','beta']};
+const badgesHTML=b=>Array.isArray(b)&&b.length?`<div class="badges">${b.filter(x=>BADGES[x]).map(x=>`<span class="badge ${BADGES[x][2]}" title="${BADGES[x][1]}">${BADGES[x][0]}</span>`).join('')}</div>`:'';
+const who=x=>`${avi(x,'sm')}<div class="grow"><b>${esc(x.username)}</b>${badgesHTML(x.badges)}<div class="tag">#${esc(x.tag||'????')}</div></div>`;
 const nreq=fr.incoming.length;
 const roleL={guest:'Guest',helper:'Helper',owner:'Owner'},open=u=>u?`<a class="btn sm" href="${esc(u)}" target="_blank" rel="noopener">Open in browser</a>`:'';
 const hosts=mine.hosting.length>0,joined=mine.joined.length>0,inv=box.invites.length;
@@ -179,7 +182,7 @@ const steps=[
 const left=steps.filter(x=>!x.done&&!(x.app&&(hosts||joined))).length;
 const startCard=left>1?`<div class="card" style="--i:1"><div class="split"><h2 style="margin:0">Getting started</h2><span class="mute" style="font-size:14px">${4-left} of 4 done</span></div><p class="mute" style="margin:6px 0 14px">A few things to make the most of your account.</p><ol class="todo">${steps.map((x,i)=>{const d=x.done||(x.app&&(hosts||joined));return `<li data-n="${i+1}" class="${d?'done':''}"><div><b>${x.t}</b>${d?'':`<span>${x.d}</span>`}</div>${d?'':x.a||''}</li>`}).join('')}</ol></div>`:'';
 const empty=(k,t)=>`<div class="empty"><div class="hic">${svg(k)}</div><div>${t}</div></div>`;
-$('#app').innerHTML=`<div class="card" style="--i:0"><div class="me">${avi(me)}<div style="flex:1;min-width:160px"><div class="mute" style="font-size:14px">Your username</div><div class="name">${esc(me.username)}</div>${me.tag?`<div class="mute" style="font-size:14px">Friend tag <b>${esc(me.username)}#${esc(me.tag)}</b>: friends add you with this in the Friends tab of their Hearth app</div>`:''}${me.premium&&me.premium.on?`<div class="mute" style="font-size:14px;margin-top:4px">✨ <b>Premium</b>, a gift from Hearth${me.premium.until===-1?', forever':', until '+new Date(me.premium.until).toLocaleDateString()}</div>`:''}</div><button class="btn sm" data-copy="${esc(me.tag?me.username+'#'+me.tag:me.username)}">Copy</button></div>
+$('#app').innerHTML=`<div class="card" style="--i:0"><div class="me">${avi(me)}<div style="flex:1;min-width:160px"><div class="mute" style="font-size:14px">Your username</div><div class="name">${esc(me.username)}</div>${badgesHTML(me.badges)}${me.tag?`<div class="mute" style="font-size:14px">Friend tag <b>${esc(me.username)}#${esc(me.tag)}</b>: friends add you with this in the Friends tab of their Hearth app</div>`:''}${me.premium&&me.premium.on?`<div class="mute" style="font-size:14px;margin-top:4px">✨ <b>Premium</b>, a gift from Hearth${me.premium.until===-1?', forever':', until '+new Date(me.premium.until).toLocaleDateString()}</div>`:''}</div><button class="btn sm" data-copy="${esc(me.tag?me.username+'#'+me.tag:me.username)}">Copy</button></div>
 <div class="picbtns"><button class="btn sm" id="pic">${me.pic?'Change picture':'Add a picture'}</button>${me.pic?'<button class="btn sm" id="picrm">Remove picture</button>':''}<input type="file" id="picin" accept="image/png,image/jpeg,image/webp" hidden></div>
 <p class="mute" style="margin:14px 0 0">Your picture shows on every Hearth you use and to your friends. Friends invite you by your username and add you with your friend tag.</p></div>
 ${startCard}
