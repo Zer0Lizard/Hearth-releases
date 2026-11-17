@@ -23,7 +23,7 @@ h1,h2{font-family:'Bricolage Grotesque',sans-serif;letter-spacing:-.02em;line-he
 <div class="nav"><a href="./"><img src="img/icon-192.png" alt=""><b>Hearth</b></a></div>
 <div class="wrap">
 <h1>What Hearth keeps about you</h1>
-<p class="mute">Hearth Studios · last updated November 4, 2026</p>
+<p class="mute">Hearth Studios · last updated November 17, 2026</p>
 
 <h2>The short version</h2>
 <p>A Hearth account keeps only what it needs to let friends find you and invite you to their game servers. Nothing is sold, and there are no ads or trackers.</p>
@@ -31,32 +31,57 @@ h1,h2{font-family:'Bricolage Grotesque',sans-serif;letter-spacing:-.02em;line-he
 <h2>Your Hearth account</h2>
 <ul>
 <li><b>Email and password:</b> handled by Google's Firebase Authentication, which stores your password scrambled (hashed) so nobody, including us, can read it. Your email is used to confirm your account and to send password reset links.</li>
-<li><b>Username:</b> shown to people who invite you or share a Hearth with you.</li>
+<li><b>Username, friend tag and profile picture</b> (if you add one): shown to your friends and to people who invite you or share a Hearth with you.</li>
+<li><b>Friends:</b> who you're friends with and friend requests you sent or got.</li>
 <li><b>Invites and Hearths:</b> who invited you to which servers and with what role, and the addresses of Hearths that are linked to an account, so you can open them.</li>
 <li><b>When you were last active</b> and which days you used it, and any reports people send about an account, so we can deal with abuse and see how many people use Hearth.</li>
 <li><b>Linked Hearths:</b> each one's name, address, Hearth version, when it last checked in, and how many servers of each game it runs (just counts, like "Minecraft: 2"), so we can see which games and versions people use. No server names, addresses, settings or players. The host can turn the game counts off in Settings › Hearth account.</li>
 <li><b>Status pages</b>, only for servers whose owner turns one on: the server's name, game, colour, whether it's online, how many players are on, its Minecraft version, how long it has been online, the join address and message the owner typed, and (only if the owner chooses) the names of the players on it. This is shown publicly at status.hearthapp.cc to anyone with the link. It's replaced as it changes, and deleted when the owner removes the server, unlinks the Hearth or deletes their account.</li>
+<li><b>Outage alerts</b>, only if the host turns them on: the phones to notify and the Discord channel to post in, so we can tell the host when their PC stops checking in.</li>
+<li><b>One-time sign-in links</b> for opening a friend's Hearth: each works once and expires within about two minutes.</li>
 <li><b>Messages we send you</b> (for example a reply to a problem report), until you delete your account.</li>
 </ul>
 
 <h2>The Hearth app on your PC</h2>
-<p>Your servers, files, settings, and the people who play on your servers stay on your own PC. Hearth doesn't send them anywhere. The only things that leave your PC are what you turn on yourself: remote access through Cloudflare, Discord notifications, invites by username through your Hearth account, problem reports you choose to send, and, while this Hearth is linked to a Hearth account, its version and how many servers of each game it runs (you can turn the game counts off).</p>
+<p>Your servers, files, settings, and the people who play on your servers stay on your own PC. Hearth doesn't send them anywhere. The only things that leave your PC are what you turn on yourself: remote access through Cloudflare, Discord notifications, phone notifications, cloud backups, playit.gg, invites by username through your Hearth account, problem reports you choose to send, and, while this Hearth is linked to a Hearth account, its version and how many servers of each game it runs (you can turn the game counts off).</p>
 
 <h2>Problem reports</h2>
 <p>When you press <b>Report a problem</b> in Hearth, it sends what you typed, your Hearth version, your Windows version, which games you run, and only if you leave them ticked, your name and recent log lines. Hearth shows you exactly what's sent before you send it, and hides addresses, emails, links and your Windows user name from the log. Your email is sent only if you type it in, so we can reply. Reports are read only by the person who makes Hearth, used only to fix problems, and never shared or sold.</p>
+
+<h2>Apps you connect</h2>
+<p>Keys you make in <b>Settings › Connected apps</b> let an app on your side read your servers' status straight from your PC. Nothing goes through us.</p>
 
 <h2>Who else handles it</h2>
 <ul>
 <li><b>Google Firebase</b> for logins and passwords.</li>
 <li><b>Cloudflare</b> runs the accounts service and its database, and remote access if you turn it on.</li>
 <li><b>GitHub</b> hosts this website and the Hearth downloads.</li>
+<li><b>Phone notifications</b> go through Hearth accounts, then through your phone's own push service (Apple, Google or Mozilla). The message is encrypted for your device.</li>
+<li><b>Cloud backups</b>, if you turn them on, go to your own Google Drive, OneDrive or Dropbox. They're stored under that company's rules; Hearth Studios never gets a copy.</li>
+<li><b>playit.gg</b>, if you turn it on, carries your players' game traffic so they can join without port forwarding.</li>
+<li><b>Discord</b> gets the notifications you send to your own Discord channel.</li>
+<li><b>Microsoft</b> handles the download and updates if you get Hearth from the Microsoft Store.</li>
 </ul>
+
+<h2>How long we keep it</h2>
+<ul>
+<li>Your account, friends, pictures and linked Hearths: until you delete your account.</li>
+<li>Which days you used Hearth: about a year.</li>
+<li>Problem reports: until we've dealt with them, then we delete them. They're saved with a scrambled form of your internet address, used only to stop spam, never the address itself.</li>
+<li>Invites you sent or got stay as closed records after you delete your account, with your account's ID number and the server names but no username, email or picture.</li>
+</ul>
+
+<h2>Your choices</h2>
+<p>You can see and change your username and picture on the <a href="account">Account page</a>, and delete everything there too. To get a copy of what we keep about you, fix something, or delete a problem report, email <a href="mailto:support@hearthapp.cc">support@hearthapp.cc</a>. We answer within 30 days.</p>
 
 <h2>Age</h2>
 <p>You must be 13 or older to make a Hearth account.</p>
 
 <h2>Deleting your account</h2>
 <p>Log in on the <a href="account">Account page</a> and choose <b>Delete my account</b>. Your username, invites and linked Hearths are removed right away, and your login is deleted from Firebase. Hearths you joined may still list your username until their host removes you.</p>
+
+<h2>Changes and contact</h2>
+<p>If this page changes in a way that matters, we'll say so in the Hearth app and on the Account page. Questions: <a href="mailto:support@hearthapp.cc">support@hearthapp.cc</a>.</p>
 </div>
 </body>
 </html>
