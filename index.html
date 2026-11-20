@@ -5,202 +5,278 @@
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Hearth: one place for all your game servers</title>
 <meta name="description" content="Hearth runs and manages your game servers on your own Windows PC: Minecraft with mods and modpacks, Valheim, Palworld, ARK, Rust and more. Start, stop, back up and update them, and share them with friends.">
-<meta name="theme-color" content="#1F1E1D">
+<meta name="theme-color" content="#1A1918">
+<meta name="hearth-version" content="0.84.0">
 <meta property="og:title" content="Hearth: one place for all your game servers">
 <meta property="og:description" content="Run Minecraft, Valheim, Palworld, ARK, Rust and more on your own PC, and manage them with your friends from anywhere.">
-<meta property="og:image" content="img/server.webp">
+<meta property="og:image" content="https://hearthapp.cc/img/og.png">
+<meta property="og:image:width" content="1440">
+<meta property="og:image:height" content="900">
+<meta property="og:url" content="https://hearthapp.cc/">
+<meta name="twitter:card" content="summary_large_image">
 <link rel="icon" type="image/png" sizes="32x32" href="img/favicon-32.png">
 <link rel="apple-touch-icon" href="img/apple-touch-icon.png">
 <link rel="preconnect" href="https://fonts.googleapis.com">
-<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:wght@600;700;800&family=Figtree:wght@400;500;600&display=swap">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,500;12..96,600&family=Figtree:wght@400;500;600&family=JetBrains+Mono:wght@400;500&display=swap">
 <style>
-:root{--bg:#1A1918;--panel:#262624;--raise:#30302E;--ink:#FAF9F5;--mute:#A6A39A;--line:#3A3936;--gold:#E5A91C;--gold2:#F2C14E;--goldink:#2A2418;--goldrgb:229,169,28;
---ease:cubic-bezier(.2,.8,.2,1);--spring:cubic-bezier(.34,1.56,.64,1)}
+/* Hearth site. Quiet warm-grey chrome, one gold accent, the app itself carries the color.
+   Signature: the ember, a small static gold dot that marks what's new or running. */
+:root{
+  --bg:#1A1918;--panel:#21201E;--raise:#2A2927;
+  --line:rgba(250,249,245,.08);--line2:rgba(250,249,245,.14);
+  --ink:#FAF9F5;--ink2:#B4B1A8;--mute:#86837B;
+  --gold:#E5A91C;--gold-hi:#EDB938;--gold-text:#F2C14E;--goldink:#231C0C;
+  --ease:cubic-bezier(.16,1,.3,1);
+  --rise:16px;--lift:24px;--settle:.985;
+  --display:'Bricolage Grotesque',Figtree,system-ui,sans-serif;
+  --mono:'JetBrains Mono',ui-monospace,Consolas,monospace;
+}
 *{box-sizing:border-box}
 html{scroll-behavior:smooth}
 body{margin:0;background:var(--bg);color:var(--ink);font:16px/1.6 Figtree,system-ui,sans-serif;-webkit-font-smoothing:antialiased;overflow-x:hidden}
-a{color:var(--gold2)}
-.wrap{max-width:1120px;margin:0 auto;padding:0 20px}
-h1,h2,h3{font-family:'Bricolage Grotesque',Figtree,sans-serif;letter-spacing:-.02em;line-height:1.1;margin:0}
+a{color:var(--gold-text);text-underline-offset:3px}
+.wrap{max-width:1200px;margin:0 auto;padding:0 32px}
+h1,h2,h3{margin:0;font-weight:600}
+h1,h2{font-family:var(--display);letter-spacing:-.02em;line-height:1.08;text-wrap:balance}
+.mono{font-family:var(--mono);font-variant-numeric:tabular-nums}
+.ember{display:inline-block;width:6px;height:6px;border-radius:50%;background:var(--gold);flex:none}
 
-/* Top bar: sticks and gets a backdrop once you scroll */
-.top{position:sticky;top:0;z-index:10;transition:background-color .25s,border-color .25s,backdrop-filter .25s;border-bottom:1px solid transparent}
-.top.scrolled{background:rgba(26,25,24,.82);backdrop-filter:blur(12px);-webkit-backdrop-filter:blur(12px);border-bottom-color:var(--line)}
-.nav{display:flex;align-items:center;gap:12px;padding:14px 0}
-.nav .brand{display:flex;align-items:center;gap:10px;color:inherit;text-decoration:none}
-.nav .brand img{width:32px;height:32px;transition:transform .35s var(--spring)}.nav .brand:hover img{transform:scale(1.1) rotate(-6deg)}
-.nav b{font:800 21px 'Bricolage Grotesque',sans-serif;letter-spacing:-.02em}
-.nav nav{margin-left:auto;display:flex;align-items:center;gap:22px;font-weight:500}
-.nav nav a{color:var(--mute);text-decoration:none;position:relative;transition:color .2s}
-.nav nav a:not(.btn)::after{content:'';position:absolute;left:0;right:0;bottom:-3px;height:2px;border-radius:2px;background:var(--gold);transform:scaleX(0);transition:transform .25s var(--ease)}
-.nav nav a:not(.btn):hover{color:var(--ink)}.nav nav a:not(.btn):hover::after{transform:scaleX(1)}
+/* Top bar */
+.top{position:sticky;top:0;z-index:10;border-bottom:1px solid transparent;transition:background-color .2s var(--ease),border-color .2s var(--ease)}
+.top.scrolled{background:rgba(26,25,24,.88);backdrop-filter:blur(8px);-webkit-backdrop-filter:blur(8px);border-bottom-color:var(--line)}
+.nav{display:flex;align-items:center;gap:12px;height:64px}
+.brand{display:flex;align-items:center;gap:8px;color:inherit;text-decoration:none}
+.brand img{width:28px;height:28px}
+.brand b{font:600 20px/1 var(--display);letter-spacing:-.01em}
+.nav nav{margin-left:auto;display:flex;align-items:center;gap:28px;font-size:15px}
+.nav nav a{color:var(--ink2);text-decoration:none;transition:color .15s var(--ease)}
+.nav nav a:hover{color:var(--ink)}
+/* Nav underline draws in from the left and leaves to the right */
+.nav nav a:not(.btn){position:relative}
+.nav nav a:not(.btn)::after{content:'';position:absolute;left:0;right:0;bottom:-4px;height:1px;background:var(--gold);transform:scaleX(0);transform-origin:right;transition:transform .25s var(--ease)}
+.nav nav a:not(.btn):hover::after{transform:scaleX(1);transform-origin:left}
 
-/* Buttons: same feel as the app (lift on hover, press on click) */
-.btn{display:inline-flex;align-items:center;gap:10px;border-radius:999px;padding:14px 26px;font:600 17px Figtree,sans-serif;text-decoration:none;border:1px solid transparent;cursor:pointer;
-transition:transform .2s var(--ease),box-shadow .2s var(--ease),background-color .2s,border-color .2s,color .2s}
-.btn:hover{transform:translateY(-1px) scale(1.04)}.btn:active{transform:scale(.95);transition-duration:.07s}
-.btn.go{background:var(--gold);color:var(--goldink)}.btn.go:hover{background:var(--gold2);box-shadow:0 8px 24px rgba(var(--goldrgb),.4)}
-.btn.ghost{color:var(--ink);border-color:var(--line);background:var(--panel)}.btn.ghost:hover{border-color:var(--mute);box-shadow:0 8px 20px rgba(0,0,0,.25)}
-.btn.sm{padding:8px 16px;font-size:15px}
-.btn svg{width:20px;height:20px;transition:transform .3s var(--spring)}.btn.go:hover svg{transform:translateY(2px)}
-.cta{display:flex;gap:12px;justify-content:center;flex-wrap:wrap}
-.small{font-size:14px;color:var(--mute);margin-top:14px}
+/* Buttons */
+.btn{display:inline-flex;align-items:center;gap:8px;height:48px;padding:0 20px;border-radius:10px;font:600 16px/1 Figtree,sans-serif;text-decoration:none;border:1px solid transparent;cursor:pointer;
+  transition:background-color .15s var(--ease),border-color .15s var(--ease),color .15s var(--ease),transform .1s var(--ease)}
+.btn:active{transform:scale(.97);transition-duration:.06s}
+.btn svg{width:18px;height:18px;transition:transform .2s var(--ease)}
+.btn.go:hover svg{transform:translateY(2px)}
+.btn.go{background:var(--gold);color:var(--goldink)}
+.btn.go:hover{background:var(--gold-hi)}
+.btn.ghost{background:var(--panel);color:var(--ink);border-color:var(--line2)}
+.btn.ghost:hover{background:var(--raise)}
+.nav .btn.ghost{height:36px;padding:0 16px;font-size:15px;color:var(--ink)}
+.cta{display:flex;gap:12px;flex-wrap:wrap;align-items:center}
+.textlink{color:var(--ink2);font-weight:500;text-decoration:none;padding:0 4px;transition:color .15s var(--ease)}
+.textlink:hover{color:var(--ink)}
 
-.hero{position:relative;padding:48px 0 40px;text-align:center}
-.hero::before{content:'';position:absolute;inset:-120px 0 auto;height:620px;background:radial-gradient(600px 300px at 50% 30%,rgba(var(--goldrgb),.16),transparent 70%);pointer-events:none;z-index:-1}
-.hero .mark{width:120px;height:120px;filter:drop-shadow(0 10px 30px rgba(var(--goldrgb),.35));animation:glow 4s ease-in-out infinite}
-@keyframes glow{0%,100%{transform:translateY(0);filter:drop-shadow(0 10px 30px rgba(var(--goldrgb),.30))}50%{transform:translateY(-6px);filter:drop-shadow(0 16px 40px rgba(var(--goldrgb),.5))}}
-.hero h1{font-size:clamp(40px,7vw,72px);margin:18px 0 14px}
-.hero h1 span{color:var(--gold)}
-.hero p.lead{font-size:clamp(17px,2.2vw,21px);color:var(--mute);max-width:660px;margin:0 auto 28px}
-.badge{display:inline-flex;align-items:center;gap:8px;font-size:14px;font-weight:600;color:var(--gold2);background:rgba(var(--goldrgb),.1);border:1px solid rgba(var(--goldrgb),.3);border-radius:999px;padding:5px 14px;margin-top:20px;text-decoration:none;transition:transform .2s var(--ease),background-color .2s}
-.badge:hover{transform:translateY(-1px);background:rgba(var(--goldrgb),.16)}
-.badge i{width:8px;height:8px;border-radius:50%;background:var(--gold);animation:ping 1.6s ease-out infinite;color:var(--gold)}
-@keyframes ping{0%{box-shadow:0 0 0 0 currentColor}80%,100%{box-shadow:0 0 0 7px transparent}}
-.shot{margin:44px auto 0;max-width:1060px;border-radius:16px;overflow:hidden;border:1px solid var(--line);box-shadow:0 30px 80px rgba(0,0,0,.5);transition:transform .5s var(--ease),box-shadow .5s var(--ease)}
-.shot:hover{transform:translateY(-4px);box-shadow:0 40px 90px rgba(0,0,0,.55),0 0 0 1px rgba(var(--goldrgb),.25)}
-.shot img{display:block;width:100%;height:auto}
+/* Hero: headline left, the pitch and actions right, the real app below */
+.hero{padding:80px 0 0}
+.hero-top{display:grid;grid-template-columns:1fr 1fr;gap:64px;align-items:center}
+.hero h1{font-size:clamp(44px,6vw,76px)}
+.hero .lead{font-size:18px;color:var(--ink2);margin:0 0 28px;max-width:480px}
+.meta{display:flex;flex-wrap:wrap;gap:4px 16px;margin-top:20px;font-size:13px;color:var(--mute)}
+.news{display:inline-flex;align-items:flex-start;gap:8px;margin-top:12px;font-size:14px;color:var(--ink2);text-decoration:none;transition:color .15s var(--ease)}
+.news:hover{color:var(--ink)}
+.news .ember{margin-top:8px}
+.news b{color:var(--gold-text);font-weight:500}
+.window{margin-top:64px;border-radius:12px;overflow:hidden;border:1px solid var(--line2);background:var(--panel);box-shadow:0 24px 64px rgba(0,0,0,.45)}
+.window img{display:block;width:100%;height:auto}
 
-section{padding:72px 0}
-section h2{font-size:clamp(30px,4.5vw,44px);margin-bottom:12px}
-section .sub{color:var(--mute);font-size:18px;max-width:660px;margin:0 0 34px}
-.grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(250px,1fr));gap:16px}
-.card{background:var(--panel);border:1px solid var(--line);border-radius:16px;padding:22px;transition:transform .2s var(--ease),box-shadow .2s var(--ease),border-color .2s}
-.card:hover{transform:translateY(-4px);box-shadow:0 14px 30px -10px rgba(0,0,0,.4),0 0 0 1px rgba(var(--goldrgb),.35)}
-.card h3{font-size:19px;margin:12px 0 6px}.card p{margin:0;color:var(--mute);font-size:15px}
-.card .new{display:inline-block;font:700 11px Figtree,sans-serif;letter-spacing:.06em;text-transform:uppercase;color:var(--goldink);background:var(--gold);border-radius:999px;padding:2px 8px;margin-left:8px;vertical-align:3px}
-.ic{width:40px;height:40px;border-radius:12px;display:grid;place-items:center;background:rgba(var(--goldrgb),.12);color:var(--gold);transition:transform .35s var(--spring),background-color .2s}.ic svg{width:21px;height:21px}
-.card:hover .ic{transform:scale(1.12) rotate(-6deg);background:rgba(var(--goldrgb),.2)}
+/* Sections */
+section{padding:112px 0 0}
+.head{display:grid;grid-template-columns:1fr 1fr;gap:64px;align-items:end;margin-bottom:48px}
+.head h2,h2.solo{font-size:clamp(32px,4vw,48px)}
+.head p{margin:0;color:var(--ink2);font-size:17px;max-width:480px}
 
-.games{display:flex;flex-wrap:wrap;gap:10px}
-.games span{padding:9px 16px;border-radius:999px;background:var(--panel);border:1px solid var(--line);font-weight:500;cursor:default;transition:transform .2s var(--ease),border-color .2s,color .2s,background-color .2s}
-.games span:hover{transform:translateY(-2px);border-color:var(--gold);color:var(--gold2);background:rgba(var(--goldrgb),.07)}
+/* Features: a quiet four-column list on hairlines, no boxes */
+.features{display:grid;grid-template-columns:repeat(3,1fr);gap:40px 32px}
+.feature{border-top:1px solid var(--line2);padding-top:20px;transition:border-color .2s var(--ease)}
+.feature:hover{border-top-color:rgba(229,169,28,.6)}
+.feature svg{width:18px;height:18px;color:var(--ink2);stroke-width:1.5;transition:color .2s var(--ease)}
+.feature:hover svg{color:var(--gold-text)}
+.feature h3{font-size:17px;font-weight:600;margin:12px 0 8px;display:flex;align-items:center;gap:8px}
+.feature h3 small{display:inline-flex;align-items:center;gap:8px;font:500 12px/1 var(--mono);color:var(--gold-text)}
+.feature p{margin:0;color:var(--ink2);font-size:15px}
 
-.duo{display:grid;grid-template-columns:1.6fr 1fr;gap:24px;align-items:center}
-.duo img{width:100%;height:auto;border-radius:14px;border:1px solid var(--line);display:block;transition:transform .4s var(--ease),box-shadow .4s var(--ease)}
-.duo img:hover{transform:translateY(-4px) scale(1.01);box-shadow:0 24px 60px rgba(0,0,0,.45)}
-.phone{max-width:300px;margin:0 auto;border-radius:30px!important;border:6px solid #000!important;box-shadow:0 20px 50px rgba(0,0,0,.5)}
+/* Friends */
+.friends{display:grid;grid-template-columns:1fr 1fr;gap:64px;align-items:start}
+.friends .copy p{color:var(--ink2);font-size:17px;margin:16px 0 28px;max-width:480px}
+.list{list-style:none;margin:0;padding:0;border-top:1px solid var(--line2)}
+.list li{display:grid;grid-template-columns:48px 1fr;gap:16px;padding:20px 0;border-bottom:1px solid var(--line)}
+.list .n{font:400 14px/1.7 var(--mono);color:var(--mute);transition:color .2s var(--ease)}
+.list li:hover .n{color:var(--gold-text)}
+.list b{display:block;font-weight:600;font-size:17px;margin-bottom:4px}
+.list span{color:var(--ink2)}
+.list span b{display:inline;font-size:inherit;margin:0;font-weight:500;color:var(--ink)}
+.opt{font:400 12px var(--mono);color:var(--mute);margin-left:8px}
 
-/* Friends section */
-.friends{display:grid;grid-template-columns:1fr 1fr;gap:16px}
-.flow{display:grid;gap:12px}
-.flow .card{display:grid;grid-template-columns:40px 1fr;gap:14px;align-items:start}
-.flow .card h3{margin:0 0 4px;font-size:17px}
+/* Games: reads like a server list */
+.games{columns:4;column-gap:32px;margin:0;padding:0;list-style:none;border-top:1px solid var(--line2)}
+.games li{break-inside:avoid;padding:12px 0;border-bottom:1px solid var(--line);font-size:15px;color:var(--ink2);transition:color .15s var(--ease)}
+.games li:hover{color:var(--ink)}
+.games li small{color:var(--mute);font-size:13px}
+.also{margin:24px 0 0;color:var(--mute);font-size:15px}
 
-ol.steps{list-style:none;padding:0;margin:0;display:grid;gap:14px;counter-reset:s}
-ol.steps li{counter-increment:s;display:grid;grid-template-columns:44px 1fr;gap:16px;background:var(--panel);border:1px solid var(--line);border-radius:16px;padding:18px 20px;transition:transform .2s var(--ease),border-color .2s,box-shadow .2s}
-ol.steps li:hover{transform:translateX(4px);border-color:rgba(var(--goldrgb),.45);box-shadow:0 10px 24px -12px rgba(0,0,0,.4)}
-ol.steps li::before{content:counter(s);width:44px;height:44px;border-radius:50%;display:grid;place-items:center;background:var(--gold);color:var(--goldink);font:800 19px 'Bricolage Grotesque',sans-serif;transition:transform .35s var(--spring)}
-ol.steps li:hover::before{transform:scale(1.1) rotate(-8deg)}
-ol.steps li>div>b{display:block;font-size:17px;margin-bottom:2px}ol.steps span{color:var(--mute)}
-ol.steps .opt{font:600 12px Figtree,sans-serif;color:var(--mute);border:1px solid var(--line);border-radius:999px;padding:1px 8px;margin-left:8px;vertical-align:2px}
+.duo{display:grid;grid-template-columns:1.7fr 1fr;gap:32px;align-items:center;margin-top:64px}
+.duo img{display:block;width:100%;height:auto;border-radius:12px;border:1px solid var(--line2)}
+.duo img.phone{max-width:280px;margin:0 auto;border-radius:32px;border:8px solid #0E0D0C;box-shadow:0 24px 48px rgba(0,0,0,.4)}
 
-details{background:var(--panel);border:1px solid var(--line);border-radius:14px;padding:0 20px;margin-bottom:10px;transition:border-color .2s,background-color .2s}
-details:hover{border-color:#4a4945}details[open]{border-color:rgba(var(--goldrgb),.4)}
-summary{cursor:pointer;font-weight:600;font-size:17px;list-style:none;display:flex;align-items:center;gap:12px;padding:16px 0}
+/* Questions */
+.faq{border-top:1px solid var(--line2)}
+details{border-bottom:1px solid var(--line)}
+summary{cursor:pointer;list-style:none;display:flex;align-items:center;gap:16px;padding:20px 0;font-weight:500;font-size:17px;transition:color .15s var(--ease)}
 summary::-webkit-details-marker{display:none}
-summary::after{content:'';margin-left:auto;width:9px;height:9px;border-right:2px solid var(--mute);border-bottom:2px solid var(--mute);transform:rotate(45deg) translate(-2px,-2px);transition:transform .25s var(--ease),border-color .2s;flex:none}
-details[open] summary::after{transform:rotate(225deg) translate(-2px,-2px);border-color:var(--gold)}
-details p{color:var(--mute);margin:0 0 16px;animation:drop .3s var(--ease)}
-@keyframes drop{from{opacity:0;transform:translateY(-6px)}}
+summary:hover{color:var(--gold-text)}
+summary::after{content:'';margin-left:auto;flex:none;width:8px;height:8px;border-right:1.5px solid var(--mute);border-bottom:1.5px solid var(--mute);transform:translateY(-2px) rotate(45deg);transition:transform .3s var(--ease),border-color .2s var(--ease)}
+details[open] summary::after{transform:translateY(2px) rotate(225deg);border-color:var(--gold-text)}
+details p{margin:0;padding-bottom:24px;color:var(--ink2);max-width:720px}
+:root{interpolate-size:allow-keywords}
+details::details-content{block-size:0;overflow:clip;opacity:0;transition:block-size .35s var(--ease),opacity .25s var(--ease),content-visibility .35s allow-discrete}
+details[open]::details-content{block-size:auto;opacity:1}
 
-.final{text-align:center;background:linear-gradient(180deg,rgba(var(--goldrgb),.10),transparent);border:1px solid var(--line);border-radius:24px;padding:56px 20px}
-footer{padding:36px 0 50px;color:var(--mute);font-size:14px;display:flex;gap:16px;flex-wrap:wrap;justify-content:space-between;border-top:1px solid var(--line)}
-footer a{color:var(--mute);text-decoration:none;transition:color .2s}footer a:hover{color:var(--ink)}
-footer .links{display:flex;gap:18px;flex-wrap:wrap}
+/* Closing */
+.final{margin-top:112px;background:var(--panel);border:1px solid var(--line);border-radius:16px;padding:64px;display:grid;grid-template-columns:1fr auto;gap:32px;align-items:center}
+.final h2{font-size:clamp(32px,4vw,44px)}
+.final p{margin:12px 0 0;color:var(--ink2);font-size:17px}
+.final .meta{margin-top:16px}
+footer{margin-top:64px;padding:32px 0 48px;color:var(--mute);font-size:14px;display:flex;gap:16px;flex-wrap:wrap;justify-content:space-between;border-top:1px solid var(--line)}
+footer a{color:var(--mute);text-decoration:none;transition:color .15s var(--ease)}footer a:hover{color:var(--ink)}
+footer .links{display:flex;gap:24px;flex-wrap:wrap}
 
-/* Scroll-in: things rise in as they come into view (only when scripts run) */
+/* Motion. Focal moment: the headline rises word by word out of its line, then the app window lifts into place.
+   Supporting: the pitch follows, sections fade up on scroll, hover states answer in color. Nothing loops. */
+@keyframes rise{from{opacity:0;transform:translateY(var(--rise))}}
+@keyframes wordup{from{transform:translateY(110%)}}
+@keyframes lift{from{opacity:0;transform:translateY(var(--lift)) scale(var(--settle))}}
+.hero h1 .w{display:inline-block;overflow:hidden;vertical-align:top;padding-bottom:.1em;margin-bottom:-.1em}
+.hero h1 .w>span{display:inline-block;animation:wordup .7s var(--ease) backwards;animation-delay:calc(var(--k,0) * 40ms)}
+.hero-copy>*{animation:rise .6s var(--ease) backwards;animation-delay:calc(240ms + var(--k,0) * 60ms)}
+.hero-copy>:nth-child(2){--k:1}.hero-copy>:nth-child(3){--k:2}.hero-copy>:nth-child(4){--k:3}
+.window{animation:lift .8s var(--ease) .38s backwards;transform-origin:50% 0}
 .js .reveal{opacity:0}
-.js .reveal.seen{opacity:1;animation:rise .65s var(--ease) backwards;animation-delay:calc(var(--i,0) * 70ms)}
-.hero>*{animation:rise .6s var(--ease) backwards}.hero>:nth-child(2){animation-delay:.06s}.hero>:nth-child(3){animation-delay:.12s}.hero>:nth-child(4){animation-delay:.18s}.hero>:nth-child(5){animation-delay:.24s}.hero>:nth-child(6){animation-delay:.3s}.hero>:nth-child(7){animation-delay:.4s}
-.hero>.mark{animation:rise .6s var(--ease) backwards,glow 4s ease-in-out .6s infinite}
-@keyframes rise{from{opacity:0;transform:translateY(14px)}}
+.js .reveal.seen{opacity:1;animation:rise .6s var(--ease) backwards;animation-delay:calc(var(--i,0) * 50ms)}
+:focus-visible{outline:2px solid var(--gold-text);outline-offset:3px;border-radius:4px}
 
-@media(max-width:820px){.duo,.friends{grid-template-columns:1fr}.nav nav a:not(.btn){display:none}section{padding:54px 0}}
-:focus-visible{outline:2px solid var(--gold2);outline-offset:3px}
-@media(prefers-reduced-motion:reduce){*,*::before,*::after{transition:none!important;animation:none!important}.js .reveal{opacity:1}html{scroll-behavior:auto}}
+@media(max-width:1000px){
+  .features{grid-template-columns:repeat(2,1fr)}
+  .games{columns:3}
+}
+@media(max-width:820px){
+  .wrap{padding:0 20px}
+  .nav nav a:not(.btn){display:none}
+  .hero{padding-top:48px}
+  .hero-top,.head,.friends,.duo,.final{grid-template-columns:1fr;gap:24px}
+  .hero h1{font-size:40px}
+  .window{margin-top:40px}
+  section{padding-top:80px}
+  .head{margin-bottom:32px}
+  .games{columns:2}
+  .final{padding:40px 24px;margin-top:80px}
+}
+@media(max-width:520px){.features{grid-template-columns:1fr}.btn{width:100%;justify-content:center}}
+@media(prefers-reduced-motion:reduce){
+  :root{--rise:0px;--lift:0px;--settle:1}
+  html{scroll-behavior:auto}
+  .hero h1 .w>span{animation:none}
+  .hero h1{animation:rise .4s var(--ease) backwards}
+  .btn:active,.btn.go:hover svg{transform:none}
+  .nav nav a:not(.btn)::after{transition:none}
+  details::details-content{transition:opacity .2s var(--ease),content-visibility .2s allow-discrete}
+  summary::after{transition:border-color .2s var(--ease)}
+}
 </style>
 <script>document.documentElement.classList.add('js')</script>
 </head>
 <body>
 <div class="top" id="top"><div class="wrap">
   <header class="nav"><a class="brand" href="./"><img src="img/icon-192.png" alt=""><b>Hearth</b></a>
-    <nav aria-label="Page"><a href="#features">Features</a><a href="#friends">Friends</a><a href="#games">Games</a><a href="#setup">Setup</a><a href="#faq">Questions</a><a class="btn ghost sm" href="account">Your account</a></nav></header>
+    <nav aria-label="Page"><a href="#features">Features</a><a href="#friends">Friends</a><a href="#games">Games</a><a href="#setup">Setup</a><a href="#faq">Questions</a><a class="btn ghost" href="account">Your account</a></nav></header>
 </div></div>
 
 <div class="wrap">
   <div class="hero">
-    <img class="mark" src="img/icon-192.png" alt="Hearth logo: a stack of servers with flames">
-    <h1>All your game servers.<br><span>One place.</span></h1>
-    <p class="lead">Hearth runs Minecraft, Valheim, Palworld, ARK, Rust and more on your own Windows PC. Start, stop, back up, install mods and modpacks, and run your servers together with friends, from your PC or your phone.</p>
-    <div class="cta">
-      <a class="btn go" href="https://github.com/Zer0Lizard/Hearth-releases/releases/latest/download/Hearth-Setup.exe"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 3v12m0 0-5-5m5 5 5-5M4 21h16"/></svg>Download for Windows</a>
-      <a class="btn ghost" href="https://apps.microsoft.com/detail/9MVHMD7F0J08" rel="noopener"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 8h14l-1 12H6L5 8Z"/><path d="M9 8V6a3 3 0 0 1 6 0v2"/></svg>Get it from the Microsoft Store</a>
-      <a class="btn ghost" href="#setup">How to set it up</a>
+    <div class="hero-top">
+      <h1>Run every game server from your own PC</h1>
+      <script>{const h=document.querySelector('.hero h1');h.setAttribute('aria-label',h.textContent);h.innerHTML=h.textContent.split(' ').map((w,k)=>`<span class="w" aria-hidden="true"><span style="--k:${k}">${w}</span></span>`).join(' ')}</script>
+      <div class="hero-copy">
+        <p class="lead">Hearth runs Minecraft, Valheim, Palworld, ARK, Rust and more on your Windows PC. Start, stop, back up, install mods and modpacks, and run your servers with friends, from your PC or your phone.</p>
+        <div class="cta">
+          <a class="btn go" href="https://github.com/Zer0Lizard/Hearth-releases/releases/latest/download/Hearth-Setup.exe"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 3v12m0 0-5-5m5 5 5-5M4 21h16"/></svg>Download for Windows</a>
+          <a class="btn ghost" href="https://apps.microsoft.com/detail/9MVHMD7F0J08" rel="noopener">Get it from the Microsoft Store</a>
+        </div>
+        <div class="meta mono"><span>Free beta</span><span>v0.84.0</span><span>Windows 10 and 11, 64-bit</span><span>About 110 MB</span></div>
+        <a class="news" href="https://github.com/Zer0Lizard/Hearth-releases/releases"><span class="ember"></span><span><b>New</b> Chat with players from the console, and crash help that names the real cause</span></a>
+      </div>
     </div>
-    <p class="small">Free beta · Hearth Beta 0.84.0 · Windows 10 and 11 (64-bit) · About 110 MB</p>
-    <a class="badge" href="https://github.com/Zer0Lizard/Hearth-releases/releases"><i></i>New: chat with players from the console, and crash help that names the real cause</a>
-    <div class="shot"><img src="img/server.webp" width="1440" height="900" alt="Hearth showing a Minecraft server: status, players, CPU and memory, and a note naming the mod that caused a crash"></div>
+    <div class="window"><img src="img/server.webp" width="1440" height="900" alt="Hearth showing a Minecraft server: status, players, CPU and memory, and a note naming the mod that caused a crash"></div>
   </div>
 </div>
 
 <section id="features"><div class="wrap">
-  <h2 class="reveal">Everything a server needs</h2>
-  <p class="sub reveal">The jobs you'd normally do in command windows and config files, in one app that keeps an eye on things for you.</p>
-  <div class="grid">
-    <div class="card reveal"><div class="ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M7 4v16l13-8z"/></svg></div><h3>Start, stop, restart</h3><p>Every server on one screen, with live CPU, memory and who's playing, and a console where you can chat with players. Stops save the world first.</p></div>
-    <div class="card reveal"><div class="ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2 3 7l9 5 9-5zM3 12l9 5 9-5M3 17l9 5 9-5"/></svg></div><h3>Mods and modpacks<span class="new">New</span></h3><p>Install Minecraft mods from Modrinth or CurseForge, or a whole CurseForge modpack in a few clicks. Hearth checks versions and names the mod behind a crash.</p></div>
-    <div class="card reveal"><div class="ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="9" cy="8" r="4"/><path d="M2 21c0-4 3-6 7-6s7 2 7 6M17 11l2 2 4-4"/></svg></div><h3>Friends and roles<span class="new">New</span></h3><p>Invite friends by their Hearth username as owners, helpers or guests, each on the servers you pick. Their Hearth shows your servers next to their own.</p></div>
-    <div class="card reveal"><div class="ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="7" y="2" width="10" height="20" rx="2"/><path d="M11 18h2"/></svg></div><h3>From anywhere</h3><p>Link your Hearth account and your Hearth gets its own secure address for free. Open it on your phone, even on mobile data, with no router setup for Hearth.</p></div>
-    <div class="card reveal"><div class="ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 7h16v13H4zM9 7V4h6v3M9 12h6"/></svg></div><h3>Backups</h3><p>Automatic backups on a schedule and before every update or modpack change, with one-click restore. Hearth warns you before a drive fills up.</p></div>
-    <div class="card reveal"><div class="ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12a9 9 0 1 1-3-6.7L21 8M21 3v5h-5"/></svg></div><h3>Crash recovery</h3><p>If a server crashes, Hearth restarts it, tells you the likely cause (a mod, a bad config setting, memory, Java), keeps the crash log and can tell you on Discord.</p></div>
-    <div class="card reveal"><div class="ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 4h18v12H3zM8 20h8M12 16v4"/></svg></div><h3>Game updates</h3><p>Hearth installs server files with SteamCMD, spots game updates and installs them when nobody is playing.</p></div>
-    <div class="card reveal"><div class="ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3a9 9 0 1 0 0 18 9 9 0 0 0 0-18zM3.6 9h16.8M3.6 15h16.8M12 3c2.5 2.6 3.8 5.6 3.8 9s-1.3 6.4-3.8 9c-2.5-2.6-3.8-5.6-3.8-9S9.5 5.6 12 3z"/></svg></div><h3>Can friends get in?</h3><p>One button tests your server's ports from the internet, and Hearth spots a Windows Firewall rule that blocks players and fixes it for you.</p></div>
-    <div class="card reveal"><div class="ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 3"/></svg></div><h3>Schedules</h3><p>Nightly restarts with warnings for players, timed backups and commands, on the days you choose.</p></div>
+  <div class="head reveal">
+    <h2>Everything a server needs</h2>
+    <p>The jobs you'd normally do in command windows and config files, in one app that keeps an eye on things for you.</p>
+  </div>
+  <div class="features">
+    <div class="feature reveal"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"><path d="M7 4v16l13-8z"/></svg><h3>Start, stop, restart</h3><p>Every server on one screen, with live CPU, memory and who's playing, and a console where you can chat with players. Stops save the world first.</p></div>
+    <div class="feature reveal"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2 3 7l9 5 9-5zM3 12l9 5 9-5M3 17l9 5 9-5"/></svg><h3>Mods and modpacks <small><span class="ember"></span>new</small></h3><p>Install Minecraft mods from Modrinth or CurseForge, or a whole CurseForge modpack in a few clicks. Hearth checks versions and names the mod behind a crash.</p></div>
+    <div class="feature reveal"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"><circle cx="9" cy="8" r="4"/><path d="M2 21c0-4 3-6 7-6s7 2 7 6M17 11l2 2 4-4"/></svg><h3>Friends and roles <small><span class="ember"></span>new</small></h3><p>Invite friends by their Hearth username as owners, helpers or guests, each on the servers you pick. Their Hearth shows your servers next to their own.</p></div>
+    <div class="feature reveal"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"><rect x="7" y="2" width="10" height="20" rx="2"/><path d="M11 18h2"/></svg><h3>From anywhere</h3><p>Link your Hearth account and your Hearth gets its own secure address for free. Open it on your phone, even on mobile data, with no router setup for Hearth.</p></div>
+    <div class="feature reveal"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"><path d="M4 7h16v13H4zM9 7V4h6v3M9 12h6"/></svg><h3>Backups</h3><p>Automatic backups on a schedule and before every update or modpack change, with one-click restore. Hearth warns you before a drive fills up.</p></div>
+    <div class="feature reveal"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12a9 9 0 1 1-3-6.7L21 8M21 3v5h-5"/></svg><h3>Crash recovery</h3><p>If a server crashes, Hearth restarts it, tells you the likely cause (a mod, a bad config setting, memory, Java), keeps the crash log and can tell you on Discord.</p></div>
+    <div class="feature reveal"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"><path d="M3 4h18v12H3zM8 20h8M12 16v4"/></svg><h3>Game updates</h3><p>Hearth installs server files with SteamCMD, spots game updates and installs them when nobody is playing.</p></div>
+    <div class="feature reveal"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3a9 9 0 1 0 0 18 9 9 0 0 0 0-18zM3.6 9h16.8M3.6 15h16.8M12 3c2.5 2.6 3.8 5.6 3.8 9s-1.3 6.4-3.8 9c-2.5-2.6-3.8-5.6-3.8-9S9.5 5.6 12 3z"/></svg><h3>Can friends get in?</h3><p>One button tests your server's ports from the internet, and Hearth spots a Windows Firewall rule that blocks players and fixes it for you.</p></div>
+    <div class="feature reveal"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 3"/></svg><h3>Schedules</h3><p>Nightly restarts with warnings for players, timed backups and commands, on the days you choose.</p></div>
   </div>
 </div></section>
 
 <section id="friends"><div class="wrap friends">
-  <div class="reveal">
-    <h2>Run servers together</h2>
-    <p class="sub" style="margin-bottom:22px">A free Hearth account is your one name across every Hearth. Friends add you by username, and their servers show up right inside your own Hearth app.</p>
+  <div class="copy reveal">
+    <h2 class="solo">Run servers together</h2>
+    <p>A free Hearth account is your one name across every Hearth. Friends add you by username, and their servers show up right inside your own Hearth app.</p>
     <a class="btn go" href="account?mode=signup">Make a free account</a>
   </div>
-  <div class="flow">
-    <div class="card reveal"><div class="ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="8" r="4"/><path d="M4 21c0-4 4-6 8-6s8 2 8 6"/></svg></div><div><h3>Make your account</h3><p>Pick a username at hearthapp.cc/account. Your friends only need that name.</p></div></div>
-    <div class="card reveal"><div class="ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 4h16v12H5l-1 4z"/><path d="M8 9h8M8 12h5"/></svg></div><div><h3>Get invited</h3><p>A friend invites you from a server's People tab. Accept it in your Hearth app or on the account page.</p></div></div>
-    <div class="card reveal"><div class="ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="7" rx="2"/><rect x="3" y="13" width="18" height="7" rx="2"/><path d="M7 7.5h.01M7 16.5h.01"/></svg></div><div><h3>See their servers in yours</h3><p>Their servers sit on your home page with status, players and Start / Stop, logged in for you. No passwords shared.</p></div></div>
-  </div>
+  <ol class="list reveal">
+    <li><span class="n">01</span><div><b>Make your account</b><span>Pick a username at hearthapp.cc/account. Your friends only need that name.</span></div></li>
+    <li><span class="n">02</span><div><b>Get invited</b><span>A friend invites you from a server's People tab. Accept it in your Hearth app or on the account page.</span></div></li>
+    <li><span class="n">03</span><div><b>See their servers in yours</b><span>Their servers sit on your home page with status, players and Start / Stop, logged in for you. No passwords shared.</span></div></li>
+  </ol>
 </div></section>
 
 <section id="games"><div class="wrap">
-  <h2 class="reveal">Games Hearth knows</h2>
-  <p class="sub reveal">Each one with its own settings, player list and the right way to stop it. Anything else you can start with a command works too.</p>
-  <div class="games reveal">
-    <span>Minecraft (Forge, NeoForge, Fabric, Paper)</span><span>CurseForge modpacks</span><span>Minecraft Bedrock</span><span>Valheim</span><span>Palworld</span><span>ARK: Survival Ascended</span><span>ARK: Survival Evolved</span><span>Counter-Strike 2</span><span>DayZ</span><span>Unturned</span><span>Icarus</span><span>Garry's Mod</span><span>Team Fortress 2</span><span>Left 4 Dead 2</span><span>Arma Reforger</span><span>Space Engineers</span><span>Vintage Story</span><span>Starbound</span><span>Barotrauma</span><span>Necesse</span><span>Assetto Corsa</span><span>Rust</span><span>Project Zomboid</span><span>7 Days to Die</span><span>Enshrouded</span><span>Satisfactory</span><span>V Rising</span><span>Don't Starve Together</span><span>Terraria</span><span>Conan Exiles</span><span>Soulmask</span><span>Sons of the Forest</span><span>Abiotic Factor</span><span>Path of Titans</span><span>The Isle Evrima</span><span>Factorio</span><span>Core Keeper</span><span>Skyrim Together Reborn</span>
+  <div class="head reveal">
+    <h2>Games Hearth knows</h2>
+    <p>Each one with its own settings, player list and the right way to stop it.</p>
+  </div>
+  <ul class="games reveal">
+    <li>Minecraft <small>Forge, NeoForge, Fabric, Paper</small></li><li>CurseForge modpacks</li><li>Minecraft Bedrock</li><li>Valheim</li><li>Palworld</li><li>ARK: Survival Ascended</li><li>ARK: Survival Evolved</li><li>Counter-Strike 2</li><li>DayZ</li><li>Unturned</li><li>Icarus</li><li>Garry's Mod</li><li>Team Fortress 2</li><li>Left 4 Dead 2</li><li>Arma Reforger</li><li>Space Engineers</li><li>Vintage Story</li><li>Starbound</li><li>Barotrauma</li><li>Necesse</li><li>Assetto Corsa</li><li>Rust</li><li>Project Zomboid</li><li>7 Days to Die</li><li>Enshrouded</li><li>Satisfactory</li><li>V Rising</li><li>Don't Starve Together</li><li>Terraria</li><li>Conan Exiles</li><li>Soulmask</li><li>Sons of the Forest</li><li>Abiotic Factor</li><li>Path of Titans</li><li>The Isle Evrima</li><li>Factorio</li><li>Core Keeper</li><li>Skyrim Together Reborn</li>
+  </ul>
+  <p class="also reveal">Anything else you can start with a command works too.</p>
+  <div class="duo">
+    <div class="reveal"><img src="img/mods.webp" width="1440" height="900" alt="Hearth's Mods tab for a Minecraft server, listing installed mods and updates" loading="lazy"></div>
+    <div class="reveal"><img class="phone" src="img/phone.webp" width="780" height="1688" alt="Hearth on a phone, showing three running servers" loading="lazy"></div>
   </div>
 </div></section>
 
-<section><div class="wrap duo">
-  <div class="reveal"><img src="img/mods.webp" width="1440" height="900" alt="Hearth's Mods tab for a Minecraft server, listing installed mods and updates" loading="lazy"></div>
-  <div class="reveal"><img class="phone" src="img/phone.webp" width="780" height="1688" alt="Hearth on a phone, showing three running servers" loading="lazy"></div>
-</div></section>
-
 <section id="setup"><div class="wrap">
-  <h2 class="reveal">Set up in a few minutes</h2>
-  <p class="sub reveal">Hearth runs on the PC that hosts your servers. Your phone and your friends just open it.</p>
-  <ol class="steps">
-    <li class="reveal"><div><b>Download and run the installer, or get it from the Microsoft Store</b><span>Or get it from the <a href="https://apps.microsoft.com/detail/9MVHMD7F0J08" rel="noopener">Microsoft Store</a>, which installs without any warning. The download from this page may say "Windows protected your PC", because Hearth is new and not signed yet: click <b>More info</b>, then <b>Run anyway</b>.</span></div></li>
-    <li class="reveal"><div><b>Log in with your Hearth account</b><span>Hearth opens in its own window. Log in with your free <a href="account?mode=signup">Hearth account</a> and you're the host of this Hearth, already linked. Nobody else can get in unless you let them. (No account? You can set up with a username and password instead.)</span></div></li>
-    <li class="reveal"><div><b>Add a server</b><span>Pick the game and a folder. Hearth downloads the server files for most games, builds a whole Minecraft modpack, or uses a server you already have.</span></div></li>
-    <li class="reveal"><div><b>Get a free address <span class="opt">Optional</span></b><span>Turn on two-factor login in <b>Settings › Your account</b>, then press <b>Get a free address</b> in <b>Settings › Hearth account</b>. Now you can open Hearth on your phone from anywhere, with nothing to set up on your router.</span></div></li>
-    <li class="reveal"><div><b>Invite your friends</b><span>Players join the game as usual. For friends who help run things, type their Hearth username on the server's <b>People</b> tab.</span></div></li>
+  <div class="head reveal">
+    <h2>Set up in a few minutes</h2>
+    <p>Hearth runs on the PC that hosts your servers. Your phone and your friends just open it.</p>
+  </div>
+  <ol class="list reveal">
+    <li><span class="n">01</span><div><b>Download and run the installer, or get it from the Microsoft Store</b><span>The <a href="https://apps.microsoft.com/detail/9MVHMD7F0J08" rel="noopener">Microsoft Store</a> version installs without any warning. The download from this page may say "Windows protected your PC", because Hearth is new and not signed yet: click <b>More info</b>, then <b>Run anyway</b>.</span></div></li>
+    <li><span class="n">02</span><div><b>Log in with your Hearth account</b><span>Hearth opens in its own window. Log in with your free <a href="account?mode=signup">Hearth account</a> and you're the host of this Hearth, already linked. Nobody else can get in unless you let them. (No account? You can set up with a username and password instead.)</span></div></li>
+    <li><span class="n">03</span><div><b>Add a server</b><span>Pick the game and a folder. Hearth downloads the server files for most games, builds a whole Minecraft modpack, or uses a server you already have.</span></div></li>
+    <li><span class="n">04</span><div><b>Get a free address<span class="opt">optional</span></b><span>Turn on two-factor login in <b>Settings › Your account</b>, then press <b>Get a free address</b> in <b>Settings › Hearth account</b>. Now you can open Hearth on your phone from anywhere, with nothing to set up on your router.</span></div></li>
+    <li><span class="n">05</span><div><b>Invite your friends</b><span>Players join the game as usual. For friends who help run things, type their Hearth username on the server's <b>People</b> tab.</span></div></li>
   </ol>
 </div></section>
 
 <section id="faq"><div class="wrap">
-  <h2 class="reveal" style="margin-bottom:28px">Questions</h2>
-  <div class="reveal">
+  <div class="head reveal"><h2>Questions</h2></div>
+  <div class="faq reveal">
   <details><summary>Is Hearth free?</summary><p>Yes, while it's in beta. Hearth accounts and the automatic address are free too.</p></details>
   <details><summary>Do my players need Hearth?</summary><p>No. They join your server in the game like always. Hearth is for you and the friends who help run things.</p></details>
   <details><summary>What's a Hearth account for?</summary><p>It's one username for every Hearth. Friends invite you by it, their servers show up in your own Hearth, and linking your Hearth gives it a secure address you can open from anywhere. You don't need one to run your own servers.</p></details>
@@ -212,23 +288,25 @@ footer .links{display:flex;gap:18px;flex-wrap:wrap}
   </div>
 </div></section>
 
-<section><div class="wrap"><div class="final reveal">
-  <h2>Bring your servers home</h2>
-  <p class="sub" style="margin:12px auto 26px">One download, and every server in one place.</p>
-  <div class="cta">
-    <a class="btn go" href="https://github.com/Zer0Lizard/Hearth-releases/releases/latest/download/Hearth-Setup.exe"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 3v12m0 0-5-5m5 5 5-5M4 21h16"/></svg>Download for Windows</a>
-      <a class="btn ghost" href="https://apps.microsoft.com/detail/9MVHMD7F0J08" rel="noopener"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 8h14l-1 12H6L5 8Z"/><path d="M9 8V6a3 3 0 0 1 6 0v2"/></svg>Get it from the Microsoft Store</a>
-    <a class="btn ghost" href="account?mode=signup">Make a Hearth account</a>
+<div class="wrap">
+  <div class="final reveal">
+    <div>
+      <h2>Bring your servers home</h2>
+      <p>One download, and every server in one place.</p>
+      <div class="meta mono"><span>v0.84.0</span><a href="https://github.com/Zer0Lizard/Hearth-releases/releases">All versions and what's new</a></div>
+    </div>
+    <div class="cta">
+      <a class="btn go" href="https://github.com/Zer0Lizard/Hearth-releases/releases/latest/download/Hearth-Setup.exe"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 3v12m0 0-5-5m5 5 5-5M4 21h16"/></svg>Download for Windows</a>
+      <a class="textlink" href="account?mode=signup">Make a Hearth account</a>
+    </div>
   </div>
-  <p class="small">Hearth Beta 0.84.0 · <a href="https://github.com/Zer0Lizard/Hearth-releases/releases">All versions and what's new</a></p>
-</div></div></section>
-
-<div class="wrap"><footer><span>Hearth · made by Hearth Studios</span><span class="links"><a href="account">Your account</a><a href="privacy">Privacy</a><a href="https://github.com/Zer0Lizard/Hearth-releases/releases">Releases</a></span></footer></div>
+  <footer><span>Hearth · made by Hearth Studios</span><span class="links"><a href="account">Your account</a><a href="privacy">Privacy</a><a href="https://github.com/Zer0Lizard/Hearth-releases/releases">Releases</a></span></footer>
+</div>
 <script>
-// Top bar backdrop after scrolling, and sections rising in as they come into view
+// Top bar backdrop after scrolling, and sections fading in as they come into view
 const bar=document.getElementById('top');addEventListener('scroll',()=>bar.classList.toggle('scrolled',scrollY>8),{passive:true});
 const els=document.querySelectorAll('.reveal');
-els.forEach(e=>{const sib=[...e.parentElement.children].filter(x=>x.classList.contains('reveal'));e.style.setProperty('--i',Math.min(sib.indexOf(e),8))});
+els.forEach(e=>{const sib=[...e.parentElement.children].filter(x=>x.classList.contains('reveal'));e.style.setProperty('--i',Math.min(sib.indexOf(e),6))});
 if('IntersectionObserver' in window){const io=new IntersectionObserver(es=>es.forEach(x=>{if(x.isIntersecting){x.target.classList.add('seen');io.unobserve(x.target)}}),{rootMargin:'0px 0px -8% 0px'});els.forEach(e=>io.observe(e))}
 else els.forEach(e=>e.classList.add('seen'));
 </script>
